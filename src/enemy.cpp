@@ -13,10 +13,14 @@ void Enemy::changeState(State<Enemy>* newState) {
     stateMachine.changeState(newState);
 }
 
-void Enemy::updateDirection(float deltaTime, glm::vec3 playerPosition)
+void Enemy::updateModelRotation()
 {
-    glm::vec3 currentPos = model->getPosition();
-    direction = glm::normalize(playerPosition - currentPos);
+    float angle = std::atan2(direction.y, direction.x);
+    angle -= glm::radians(90.0f);
+
+    glm::vec3 rotation = model->getRotation();
+    rotation.z = angle;
+    model->setRotation(rotation);
 }
 
 void Enemy::move(float deltaTime)

@@ -49,3 +49,27 @@ public:
 private:
     EnemyMoveState() {}
 };
+
+class EnemyRunAwayState : public State<Enemy> {
+public:
+    static EnemyRunAwayState& getInstance() {
+        static EnemyRunAwayState instance;
+        return instance;
+    }
+
+    void enter(Enemy* enemy) override {
+        std::cout << "[EnemyRunAwayState] Enter: enemy starts running away\n";
+    }
+
+    void update(Enemy* enemy, float deltaTime) override {
+        enemy->move(deltaTime);
+    }
+
+    void exit(Enemy* enemy) override {
+        std::cout << "[EnemyRunAwayState] Exit: enemy stops running away\n";
+    }
+
+private:
+    EnemyRunAwayState() {}
+};
+

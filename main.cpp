@@ -30,7 +30,7 @@ int main()
     unsigned int enemyVertexCount = 0;
     unsigned int enemyIndexCount = 0;
 
-    generateRectangleMesh(enemyVertices, enemyIndices, enemyVertexCount, enemyIndexCount);
+    generatetriangleMesh(enemyVertices, enemyIndices, enemyVertexCount, enemyIndexCount, 0.2f, 0.1f, glm::vec3(1.0f, 1.0f, 0.0f));
     Model enemyModel(enemyVertices, enemyVertexCount, enemyIndices, enemyIndexCount);
     enemyModel.setShader(std::make_shared<Shader>(shader));
     enemyModel.setPosition(glm::vec3(-2.0f, -1.0f, 0.0f)); // top-left corner of screen
@@ -73,20 +73,32 @@ int main()
                                                 0.1f, 100.0f);
 
         // enemy logic
-        enemy.updateDirection(deltaTime, model.getPosition());
         static bool initialized = false;
         if (!initialized) {
-            enemy.changeState(&EnemyMoveState::getInstance());
+            enemy.changeState(&EnemyIdleState::getInstance());
             initialized = true;
         }
-        if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-        {
-            enemy.changeState(&EnemyIdleState::getInstance());
+
+        if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+            if (enemy.getStateMachine().getCurrentState() != &EnemyIdleState::getInstance())
+                enemy.changeState(&EnemyIdleState::getInstance());
         }
-        else if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS)
-        {
-            enemy.changeState(&EnemyMoveState::getInstance());
-		}
+        else if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+            if (enemy.getStateMachine().getCurrentState() != &EnemyMoveState::getInstance()) {
+                glm::vec3 towardDir = glm::normalize(model.getPosition() - enemy.getModel()->getPosition());
+				enemy.setDirection(towardDir);
+				enemy.updateModelRotation();
+                enemy.changeState(&EnemyMoveState::getInstance());
+            }
+        }
+        else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+            if (enemy.getStateMachine().getCurrentState() != &EnemyRunAwayState::getInstance()) {
+                glm::vec3 awayDir = glm::normalize(enemy.getModel()->getPosition() - model.getPosition());
+                enemy.setDirection(awayDir);
+                enemy.updateModelRotation();
+                enemy.changeState(&EnemyRunAwayState::getInstance());
+            }
+        }
         enemy.update(deltaTime);
 
         // player draw

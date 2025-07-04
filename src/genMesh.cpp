@@ -51,3 +51,23 @@ void generateRectangleMesh(Vertex *&vertices, GLuint *&indices, unsigned int &ve
     vertices[2] = {{w, h, 0.0f}, {0, 0, 1}, {0, 0, 1}, {1, 1}};
     vertices[3] = {{-w, h, 0.0f}, {1, 1, 0}, {0, 0, 1}, {0, 1}};
 }
+
+void generatetriangleMesh(Vertex*& vertices, GLuint*& indices, unsigned int& vertexCount, unsigned int& indexCount, float headLength, float tailLength, glm::vec3 color)
+{
+    vertexCount = 3;
+    indexCount = 3;
+
+    vertices = new Vertex[vertexCount];
+    indices = new GLuint[indexCount]{ 0, 1, 2 };
+
+	float w = tailLength / 2.0f;
+
+    vertices[0] = { {0.0f, headLength, 0.0f} };
+    vertices[1] = { {w, 0.0f, 0.0f} };
+    vertices[2] = { {-w, 0.0f, 0.0f} };
+
+    for (unsigned int i = 0; i < vertexCount; ++i)
+    {
+        vertices[i].color = color;
+	}
+}

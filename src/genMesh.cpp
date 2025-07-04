@@ -16,7 +16,7 @@ void generateCircleMesh(Vertex *&outVertices, GLuint *&outIndices, unsigned int 
 
     for (int i = 0; i <= segments; ++i)
     {
-        float angle = 2.0f * M_PI * i / segments;
+        float angle = 2.0f * glm::pi<float>() * i / segments;
         float x = cos(angle) * radius;
         float y = sin(angle) * radius;
 

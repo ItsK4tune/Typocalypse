@@ -4,6 +4,7 @@
 #include "global.h"
 #include "model.h"
 #include "enemy.h"
+#include "enemy_state.h"
 
 #include "utilities/init.h"
 #include "utilities/genMesh.h"
@@ -73,7 +74,20 @@ int main()
 
         // enemy logic
         enemy.updateDirection(deltaTime, model.getPosition());
-        enemy.move(deltaTime);
+        static bool initialized = false;
+        if (!initialized) {
+            enemy.changeState(&EnemyMoveState::getInstance());
+            initialized = true;
+        }
+        if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+        {
+            enemy.changeState(&EnemyIdleState::getInstance());
+        }
+        else if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS)
+        {
+            enemy.changeState(&EnemyMoveState::getInstance());
+		}
+        enemy.update(deltaTime);
 
         // player draw
         glm::mat4 mvp = projection * view * model.getModelMatrix();

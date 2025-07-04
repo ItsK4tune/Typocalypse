@@ -19,7 +19,7 @@ int main()
     unsigned int vertexCount = 0;
     unsigned int indexCount = 0;
 
-    generateCircleMesh(vertices, indices, vertexCount, indexCount, 64, 0.01f);
+    generateCircleMesh(vertices, indices, vertexCount, indexCount, 64, 0.05f);
     Model model(vertices, vertexCount, indices, indexCount);
     Shader shader("basic.vert", "basic.frag");
     model.setShader(std::make_shared<Shader>(shader));
@@ -30,12 +30,12 @@ int main()
     unsigned int enemyVertexCount = 0;
     unsigned int enemyIndexCount = 0;
 
-    generatetriangleMesh(enemyVertices, enemyIndices, enemyVertexCount, enemyIndexCount, 0.2f, 0.1f, glm::vec3(1.0f, 1.0f, 0.0f));
+    generatetriangleMesh(enemyVertices, enemyIndices, enemyVertexCount, enemyIndexCount, 0.12f, 0.1f, glm::vec3(1.0f, 1.0f, 0.0f));
     Model enemyModel(enemyVertices, enemyVertexCount, enemyIndices, enemyIndexCount);
     enemyModel.setShader(std::make_shared<Shader>(shader));
     enemyModel.setPosition(glm::vec3(-2.0f, -1.0f, 0.0f)); // top-left corner of screen
 
-    Enemy enemy(std::make_shared<Model>(enemyModel));
+    CreepEnemy enemy(std::make_shared<Model>(enemyModel));
 
     double lastTime = glfwGetTime();
     float lastFrame = glfwGetTime();
@@ -74,31 +74,37 @@ int main()
 
         // enemy logic
         static bool initialized = false;
-        if (!initialized) {
+        if (!initialized)
+        {
             enemy.changeState(&EnemyIdleState::getInstance());
             initialized = true;
         }
 
-        if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+        if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+        {
             if (enemy.getStateMachine().getCurrentState() != &EnemyIdleState::getInstance())
                 enemy.changeState(&EnemyIdleState::getInstance());
         }
-        else if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-            if (enemy.getStateMachine().getCurrentState() != &EnemyMoveState::getInstance()) {
+        else if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        {
+            if (enemy.getStateMachine().getCurrentState() != &EnemyMoveState::getInstance())
+            {
                 glm::vec3 towardDir = glm::normalize(model.getPosition() - enemy.getModel()->getPosition());
-				enemy.setDirection(towardDir);
-				enemy.updateModelRotation();
+                enemy.setDirection(towardDir);
                 enemy.changeState(&EnemyMoveState::getInstance());
             }
         }
-        else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-            if (enemy.getStateMachine().getCurrentState() != &EnemyRunAwayState::getInstance()) {
+        else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        {
+            if (enemy.getStateMachine().getCurrentState() != &EnemyRunAwayState::getInstance())
+            {
                 glm::vec3 awayDir = glm::normalize(enemy.getModel()->getPosition() - model.getPosition());
                 enemy.setDirection(awayDir);
-                enemy.updateModelRotation();
                 enemy.changeState(&EnemyRunAwayState::getInstance());
             }
         }
+
+        enemy.updateModelRotation(deltaTime);
         enemy.update(deltaTime);
 
         // player draw

@@ -1,36 +1,64 @@
 #include "enemy.h"
 
-Enemy::Enemy(std::shared_ptr<Model> m)
-    : stateMachine(this), model(m), direction(glm::vec3(0.0f, 0.0f, 0.0f)), speed(0.1f)
+CreepEnemy::CreepEnemy(std::shared_ptr<Model> m)
+    : stateMachine(this), model(m), direction(glm::vec3(0.0f, 0.0f, 0.0f))
 {
 }
+CreepEnemy::~CreepEnemy()
+{
+    if (model)
+    {
+        model->cleanup();
+    }
+}
 
-void Enemy::update(float deltaTime) {
+void CreepEnemy::update(float deltaTime)
+{
     stateMachine.update(deltaTime);
 }
 
-void Enemy::changeState(State<Enemy>* newState) {
+void CreepEnemy::changeState(State<EnemyAbstract> *newState)
+{
     stateMachine.changeState(newState);
 }
 
-void Enemy::updateModelRotation()
+void CreepEnemy::updateModelRotation(float deltaTime)
 {
-    float angle = std::atan2(direction.y, direction.x);
-    angle -= glm::radians(90.0f);
-
     glm::vec3 rotation = model->getRotation();
-    rotation.z = angle;
+    if (glm::normalize(rotation) == direction)
+    {
+        return; // No rotation needed if direction is already aligned
+    }
+
+    float targetAngle = std::atan2(direction.y, direction.x) - glm::radians(90.0f);
+    float currentAngle = rotation.z;
+
+    float deltaAngle = targetAngle - currentAngle;
+    deltaAngle = std::atan2(std::sin(deltaAngle), std::cos(deltaAngle));
+
+    float maxDelta = rotationSpeed * deltaTime;
+    deltaAngle = glm::clamp(deltaAngle, -maxDelta, maxDelta);
+
+    rotation.z = currentAngle + deltaAngle;
     model->setRotation(rotation);
 }
 
-void Enemy::move(float deltaTime)
+void CreepEnemy::move(float deltaTime)
 {
+    acceleration = direction * accelerationRate;
+    velocity += acceleration * deltaTime;
+
+    if (glm::length(velocity) > maxSpeed)
+    {
+        velocity = glm::normalize(velocity) * maxSpeed;
+    }
+
     glm::vec3 currentPos = model->getPosition();
-    glm::vec3 newPos = currentPos + direction * speed * deltaTime;
+    glm::vec3 newPos = currentPos + velocity * deltaTime;
     model->setPosition(newPos);
 }
 
-void Enemy::draw()
+void CreepEnemy::draw()
 {
     model->draw();
 }

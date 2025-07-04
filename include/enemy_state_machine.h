@@ -1,11 +1,11 @@
 #pragma once
 
-class Enemy;
+class EnemyAbstract;
 #include "state_machine.h"
 #include "enemy.h"
 
-
-class EnemyStateMachine : public StateMachine<Enemy> {
+class EnemyStateMachine : public StateMachine<EnemyAbstract>
+{
 public:
-    EnemyStateMachine(Enemy* e) : StateMachine<Enemy>(e) {}
+    EnemyStateMachine(EnemyAbstract *e) : StateMachine<EnemyAbstract>(e) {}
 };

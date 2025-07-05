@@ -2,6 +2,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "global.h"
+#include "camera.h"
 #include "model.h"
 #include "enemy.h"
 #include "enemy_state.h"
@@ -12,6 +13,9 @@
 int main()
 {
     GLFWwindow *window = createWindow(Global::screenWidth, Global::screenHeight, "Typocalypse");
+
+    // camera
+    Camera camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
     // player
     Vertex *vertices = nullptr;
@@ -33,7 +37,7 @@ int main()
     generatetriangleMesh(enemyVertices, enemyIndices, enemyVertexCount, enemyIndexCount, 0.12f, 0.1f, glm::vec3(1.0f, 1.0f, 0.0f));
     Model enemyModel(enemyVertices, enemyVertexCount, enemyIndices, enemyIndexCount);
     enemyModel.setShader(std::make_shared<Shader>(shader));
-    enemyModel.setPosition(glm::vec3(-2.0f, -1.0f, 0.0f)); // top-left corner of screen
+    enemyModel.setPosition(glm::vec3(-2.0f, -1.0f, 0.0f));
 
     CreepEnemy enemy(std::make_shared<Model>(enemyModel));
 
@@ -63,15 +67,6 @@ int main()
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LESS);
 
-        glm::mat4 view = glm::lookAt(
-            glm::vec3(0.0f, 0.0f, 3.0f),
-            glm::vec3(0.0f, 0.0f, 0.0f),
-            glm::vec3(0.0f, 1.0f, 0.0f));
-
-        glm::mat4 projection = glm::perspective(glm::radians(45.0f),
-                                                (float)Global::screenWidth / (float)Global::screenHeight,
-                                                0.1f, 100.0f);
-
         // enemy logic
         static bool initialized = false;
         if (!initialized)
@@ -85,27 +80,26 @@ int main()
             if (enemy.getStateMachine().getCurrentState() != &EnemyIdleState::getInstance())
                 enemy.changeState(&EnemyIdleState::getInstance());
         }
-        else if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        bool wPressed = glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS;
+        bool sPressed = glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS;
+
+        if (wPressed || sPressed)
         {
+            glm::vec3 direction = glm::normalize(model.getPosition() - enemy.getModel()->getPosition());
+            direction = wPressed ? direction : -direction;
+
+            enemy.setDirection(direction);
+
             if (enemy.getStateMachine().getCurrentState() != &EnemyMoveState::getInstance())
             {
-                glm::vec3 towardDir = glm::normalize(model.getPosition() - enemy.getModel()->getPosition());
-                enemy.setDirection(towardDir);
                 enemy.changeState(&EnemyMoveState::getInstance());
             }
         }
-        else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        {
-            if (enemy.getStateMachine().getCurrentState() != &EnemyRunAwayState::getInstance())
-            {
-                glm::vec3 awayDir = glm::normalize(enemy.getModel()->getPosition() - model.getPosition());
-                enemy.setDirection(awayDir);
-                enemy.changeState(&EnemyRunAwayState::getInstance());
-            }
-        }
 
-        enemy.updateModelRotation(deltaTime);
         enemy.update(deltaTime);
+
+        glm::mat4 projection = camera.getPerspectiveProjection(45.0f, (float)Global::screenWidth / (float)Global::screenHeight, 0.1f, 100.0f);
+        glm::mat4 view = camera.getViewMatrix();
 
         // player draw
         glm::mat4 mvp = projection * view * model.getModelMatrix();

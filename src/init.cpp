@@ -1,5 +1,6 @@
 #include "utilities/init.h"
 #include <iostream>
+#include <global.h>
 
 GLFWwindow *createWindow(int width, int height, const char *title)
 {
@@ -30,6 +31,8 @@ GLFWwindow *createWindow(int width, int height, const char *title)
         return nullptr;
     }
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSetCharCallback(window, character_callback);
+    glfwSetKeyCallback(window, key_callback);
 
     return window;
 }
@@ -37,6 +40,27 @@ GLFWwindow *createWindow(int width, int height, const char *title)
 void framebuffer_size_callback(GLFWwindow *window, int width, int height)
 {
     glViewport(0, 0, width, height);
+}
+
+void character_callback(GLFWwindow *window, unsigned int codepoint)
+{
+    Global::currentTypedWord += static_cast<char>(codepoint);
+}
+
+void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods)
+{
+    if (action == GLFW_PRESS || action == GLFW_REPEAT)
+    {
+        if (key == GLFW_KEY_BACKSPACE && !Global::currentTypedWord.empty())
+        {
+            Global::currentTypedWord.pop_back();
+        }
+        else if (key == GLFW_KEY_ENTER)
+        {
+            // checkTypedWord();
+            Global::currentTypedWord.clear();
+        }
+    }
 }
 
 void terminate(GLFWwindow *window)

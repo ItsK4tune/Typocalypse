@@ -76,8 +76,8 @@ private:
     glm::vec3 direction;
     glm::vec3 velocity = glm::vec3(0.0f);
     glm::vec3 acceleration = glm::vec3(0.0f);
-    float maxSpeed = 1.0f;
-    float accelerationRate = 5.0f;
+    float maxSpeed = 0.5f;
+    float accelerationRate = 3.0f;
     float rotationSpeed = glm::radians(1440.0f);
     std::string word = "Creep";
 };

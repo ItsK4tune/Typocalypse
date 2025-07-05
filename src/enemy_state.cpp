@@ -1,49 +1,57 @@
 #include "enemy_state.h"
 
-EnemyIdleState::EnemyIdleState() {}
-
-EnemyIdleState &EnemyIdleState::getInstance()
+EnemyFreezeState::EnemyFreezeState() {}
+EnemyFreezeState &EnemyFreezeState::getInstance()
 {
-    static EnemyIdleState instance;
+    static EnemyFreezeState instance;
     return instance;
 }
-
-void EnemyIdleState::enter(EnemyAbstract *enemy)
-{
-    std::cout << "[EnemyIdleState] Enter: enemy idling\n";
-}
-
-void EnemyIdleState::update(EnemyAbstract *enemy, float deltaTime)
+void EnemyFreezeState::enter(EnemyAbstract *enemy)
 {
     enemy->setVelocity(glm::vec3(0.0f));
     enemy->setAcceleration(glm::vec3(0.0f));
 }
-
-void EnemyIdleState::exit(EnemyAbstract *enemy)
+void EnemyFreezeState::update(EnemyAbstract *enemy, float deltaTime)
 {
-    std::cout << "[EnemyIdleState] Exit: enemy stop idling\n";
+    enemy->draw();
+}
+void EnemyFreezeState::exit(EnemyAbstract *enemy)
+{
 }
 
 EnemyMoveState::EnemyMoveState() {}
-
 EnemyMoveState &EnemyMoveState::getInstance()
 {
     static EnemyMoveState instance;
     return instance;
 }
-
 void EnemyMoveState::enter(EnemyAbstract *enemy)
 {
-    std::cout << "[EnemyMoveState] Enter: enemy starts moving\n";
 }
-
 void EnemyMoveState::update(EnemyAbstract *enemy, float deltaTime)
 {
     enemy->updateModelRotation(deltaTime);
     enemy->move(deltaTime);
+    enemy->draw();
 }
-
 void EnemyMoveState::exit(EnemyAbstract *enemy)
 {
-    std::cout << "[EnemyMoveState] Exit: enemy stops moving\n";
+}
+
+EnemyDieState::EnemyDieState() {}
+EnemyDieState &EnemyDieState::getInstance()
+{
+    static EnemyDieState instance;
+    return instance;
+}
+void EnemyDieState::enter(EnemyAbstract *enemy)
+{
+    enemy->setVelocity(glm::vec3(0.0f));
+    enemy->setAcceleration(glm::vec3(0.0f));
+}
+void EnemyDieState::update(EnemyAbstract *enemy, float deltaTime)
+{
+}
+void EnemyDieState::exit(EnemyAbstract *enemy)
+{
 }

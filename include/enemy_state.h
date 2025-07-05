@@ -2,19 +2,18 @@
 
 #include "state.h"
 #include "enemy.h"
-#include <iostream>
 
-class EnemyIdleState : public State<EnemyAbstract>
+class EnemyFreezeState : public State<EnemyAbstract>
 {
-public:
-    static EnemyIdleState &getInstance();
+public: 
+    static EnemyFreezeState &getInstance();
 
     void enter(EnemyAbstract *enemy) override;
     void update(EnemyAbstract *enemy, float deltaTime) override;
     void exit(EnemyAbstract *enemy) override;
 
 private:
-    EnemyIdleState();
+    EnemyFreezeState();
 };
 
 class EnemyMoveState : public State<EnemyAbstract>
@@ -28,4 +27,17 @@ public:
 
 private:
     EnemyMoveState();
+};
+
+
+class EnemyDieState : public State<EnemyAbstract>
+{
+public:
+    static EnemyDieState &getInstance();
+
+    void enter(EnemyAbstract *enemy) override;
+    void update(EnemyAbstract *enemy, float deltaTime) override;
+    void exit(EnemyAbstract *enemy) override;
+private:
+    EnemyDieState();
 };

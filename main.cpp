@@ -9,13 +9,17 @@
 
 #include "utilities/init.h"
 #include "utilities/genMesh.h"
+#include "utilities/text_renderer.h"
+
+Camera *camera = new Camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
 int main()
 {
     GLFWwindow *window = createWindow(Global::screenWidth, Global::screenHeight, "Typocalypse");
 
-    // camera
-    Camera camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    // text renderer
+    TextRenderer text(Global::screenWidth, Global::screenHeight);
+    text.load("../resources/fonts/TimesRegular.ttf", 48);
 
     // player
     Vertex *vertices = nullptr;
@@ -98,8 +102,8 @@ int main()
 
         enemy.update(deltaTime);
 
-        glm::mat4 projection = camera.getPerspectiveProjection(45.0f, (float)Global::screenWidth / (float)Global::screenHeight, 0.1f, 100.0f);
-        glm::mat4 view = camera.getViewMatrix();
+        glm::mat4 projection = camera->getPerspectiveProjection(45.0f, (float)Global::screenWidth / (float)Global::screenHeight, 0.1f, 100.0f);
+        glm::mat4 view = camera->getViewMatrix();
 
         // player draw
         glm::mat4 mvp = projection * view * model.getModelMatrix();
@@ -112,6 +116,45 @@ int main()
         enemy.getModel()->getShader()->use();
         enemy.getModel()->getShader()->setMat4("mvp", glm::value_ptr(enemyMVP));
         enemy.draw();
+
+        glm::vec3 enemyPos = enemy.getModel()->getPosition();
+        glm::vec4 worldPos = glm::vec4(enemyPos, 1.0f);
+
+        glm::vec4 clipSpacePos = projection * view * worldPos;
+        if (clipSpacePos.w > 0.0f)
+        {
+            glm::vec3 ndc = glm::vec3(clipSpacePos) / clipSpacePos.w; // [-1, 1]
+            float x = (ndc.x * 0.5f + 0.5f) * Global::screenWidth;
+            float y = (ndc.y * 0.5f + 0.5f) * Global::screenHeight;
+
+            // Dịch chữ xuống dưới enemy một chút (ví dụ 20px)
+            y -= 20.0f;
+
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            text.renderText(enemy.getWord(), x, y, 0.7f, glm::vec3(0.1f, 0.1f, 0.1f));
+        }
+
+        std::string textToRender = Global::currentTypedWord;
+        float scale = 1.0f;
+        float textWidth = 0.0f;
+
+        const auto &chars = text.getCharacters(); // dùng getter
+
+        // Tính chiều rộng chuỗi để căn giữa
+        for (char c : textToRender)
+        {
+            if (chars.count(c))
+            {
+                textWidth += (chars.at(c).advance >> 6) * scale;
+            }
+        }
+
+        float x = (Global::screenWidth - textWidth) / 2.0f;
+        float y = 50.0f; // cách mép dưới màn hình 50px
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        text.renderText(textToRender, x, y, scale, glm::vec3(0.2f, 0.2f, 0.2f));
 
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         {

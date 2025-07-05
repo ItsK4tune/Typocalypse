@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <string>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include "model.h"
@@ -17,6 +18,8 @@ public:
     virtual void setAcceleration(const glm::vec3 &acc) = 0;
     virtual void setMaxSpeed(float speed) = 0;
     virtual void setAccelerationRate(float rate) = 0;
+    virtual void setWord(const std::string &w) = 0;
+    virtual const std::string &getWord() const = 0;
 
     virtual std::shared_ptr<Model> getModel() const = 0;
     virtual EnemyStateMachine &getStateMachine() = 0;
@@ -47,7 +50,8 @@ public:
     void setAcceleration(const glm::vec3 &acc) override { acceleration = acc; }
     void setMaxSpeed(float speed) override { maxSpeed = speed; }
     void setAccelerationRate(float rate) override { accelerationRate = rate; }
-
+    void setWord(const std::string &w) override { word = w; }
+    
     std::shared_ptr<Model> getModel() const override { return model; }
     EnemyStateMachine &getStateMachine() override { return stateMachine; }
     glm::vec3 getDirection() const override { return direction; }
@@ -55,6 +59,7 @@ public:
     glm::vec3 getAcceleration() const override { return acceleration; }
     float getMaxSpeed() const override { return maxSpeed; }
     float getAccelerationRate() const override { return accelerationRate; }
+    const std::string &getWord() const override { return word; }
 
     // State machine
     void update(float deltaTime) override;
@@ -74,4 +79,5 @@ private:
     float maxSpeed = 1.0f;
     float accelerationRate = 5.0f;
     float rotationSpeed = glm::radians(1440.0f);
+    std::string word = "Creep";
 };

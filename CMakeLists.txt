@@ -3,7 +3,10 @@ project(Project_T)
 
 set(CMAKE_CXX_STANDARD 17)
 
-include_directories(include)
+include_directories(
+    include
+    ${CMAKE_SOURCE_DIR}/include/freetype
+)
 
 add_library(glad STATIC src/glad.c)
 
@@ -26,11 +29,11 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     message(STATUS "Compiler: MSVC")
 
     target_compile_definitions(Project_T PRIVATE GLFW_STATIC)
-    target_link_libraries(Project_T glad "${CMAKE_SOURCE_DIR}/lib/glfw3.lib" opengl32)
+    target_link_libraries(Project_T glad "${CMAKE_SOURCE_DIR}/lib/glfw3.lib" "${CMAKE_SOURCE_DIR}/lib/freetype.lib" opengl32)
 
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     message(STATUS "Compiler: GCC/Clang")
 
-    target_link_libraries(Project_T glad glfw3 opengl32)
+    target_link_libraries(Project_T glad glfw3 freetype opengl32)
     target_link_options(Project_T PRIVATE -mconsole)
 endif()

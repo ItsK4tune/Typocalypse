@@ -28,6 +28,10 @@ link_directories("${CMAKE_SOURCE_DIR}/lib")
 if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     message(STATUS "Compiler: MSVC")
 
+    add_custom_command(TARGET Project_T POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_SOURCE_DIR}/lib/freetype.dll"
+        $<TARGET_FILE_DIR:Project_T>)
     target_compile_definitions(Project_T PRIVATE GLFW_STATIC)
     target_link_libraries(Project_T glad "${CMAKE_SOURCE_DIR}/lib/glfw3.lib" "${CMAKE_SOURCE_DIR}/lib/freetype.lib" opengl32)
 

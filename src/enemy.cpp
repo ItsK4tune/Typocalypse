@@ -27,7 +27,7 @@ void CreepEnemy::updateModelRotation(float deltaTime)
     glm::vec3 rotation = model->getRotation();
     if (glm::normalize(rotation) == direction)
     {
-        return; // No rotation needed if direction is already aligned
+        return; 
     }
 
     float targetAngle = std::atan2(direction.y, direction.x) - glm::radians(90.0f);

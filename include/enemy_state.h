@@ -41,3 +41,15 @@ public:
 private:
     EnemyDieState();
 };
+
+class EnemyRespawnState : public State<EnemyAbstract>
+{
+public:
+    static EnemyRespawnState &getInstance();
+
+    void enter(EnemyAbstract *enemy) override;
+    void update(EnemyAbstract *enemy, float deltaTime) override;
+    void exit(EnemyAbstract *enemy) override;
+private:
+    EnemyRespawnState();
+};

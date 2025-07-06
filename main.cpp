@@ -2,26 +2,56 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <cstdlib>
 #include <ctime>
+#include <algorithm> // std::shuffle
+#include <random>
 
 #include "global.h"
 #include "camera.h"
 #include "model.h"
 #include "enemy.h"
 #include "enemy_state.h"
+#include "global_state.h"
 
 #include "utilities/init.h"
 #include "utilities/genMesh.h"
 #include "utilities/text_renderer.h"
 #include "utilities/spawn_enemy.h"
+#include "utilities/AABB.h"
+
+AABB *playerAABB = new AABB(glm::vec3(-0.05f, -0.05f, 0.0f), glm::vec3(0.05f, 0.05f, 0.0f));
+
+void respawnRandomEnemy()
+{
+    auto &enemies = Global::getInstance().enemy.enemies;
+
+    std::vector<std::shared_ptr<CreepEnemy>> deadEnemies;
+    for (auto &e : enemies)
+    {
+        if (e->getStateMachine().getCurrentState() == &EnemyDieState::getInstance())
+        {
+            deadEnemies.push_back(e);
+        }
+    }
+
+    if (!deadEnemies.empty())
+    {
+        std::shuffle(deadEnemies.begin(), deadEnemies.end(), std::default_random_engine(static_cast<unsigned int>(time(nullptr))));
+
+        auto &chosen = deadEnemies.front();
+        chosen->changeState(&EnemyRespawnState::getInstance());
+    }
+}
 
 int main()
 {
     srand(static_cast<unsigned int>(time(nullptr)));
-    GLFWwindow *window = createWindow(Global::screenWidth, Global::screenHeight, "Typocalypse");
+    GLFWwindow *window = createWindow(Global::getInstance().screenWidth, Global::getInstance().screenHeight, "Typocalypse");
 
     // text renderer
-    TextRenderer text(Global::screenWidth, Global::screenHeight);
+    TextRenderer text(Global::getInstance().screenWidth, Global::getInstance().screenHeight);
     text.load("../resources/fonts/TimesRegular.ttf", 48);
+
+    initTriangleMesh();
 
     // player
     Vertex *vertices = nullptr;
@@ -37,7 +67,6 @@ int main()
     std::vector<std::string> wordList = {"cat", "dog", "fish", "bird", "mouse", "elephant", "giraffe", "lion", "tiger", "bear",
                                          "zebra", "monkey", "kangaroo", "panda", "rabbit", "fox", "wolf", "deer", "cow", "sheep"};
     initEnemyPool(wordList, shader);
-    spawnInitialEnemies(Global::numberOfEnemies, model.getPosition());
 
     double lastTime = glfwGetTime();
     float lastFrame = glfwGetTime();
@@ -69,9 +98,16 @@ int main()
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+        Global::getInstance().update(deltaTime);
+        if (Global::getInstance().stateMachine.getCurrentState() == &GlobalMenuState::getInstance())
+        {
+            continue;
+        }
+        
+
         // Set matrices
-        glm::mat4 projection = Global::camera->getPerspectiveProjection(45.0f, (float)Global::screenWidth / Global::screenHeight, 0.1f, 100.0f);
-        glm::mat4 view = Global::camera->getViewMatrix();
+        glm::mat4 projection = Global::getInstance().camera->getPerspectiveProjection(45.0f, (float)Global::getInstance().screenWidth / Global::getInstance().screenHeight, 0.1f, 100.0f);
+        glm::mat4 view = Global::getInstance().camera->getViewMatrix();
 
         // Draw player
         glm::mat4 mvp = projection * view * model.getModelMatrix();
@@ -79,18 +115,29 @@ int main()
         model.getShader()->setMat4("mvp", glm::value_ptr(mvp));
         model.draw();
 
-        for (auto &e : Global::enemies)
+        if (Global::getInstance().enemy.numberOfEnemies > 0)
         {
+            respawnRandomEnemy();
+            Global::getInstance().enemy.numberOfEnemies--;
+        }
+
+        for (auto &e : Global::getInstance().enemy.enemies)
+        {
+            if (e->getStateMachine().getCurrentState() == &EnemyDieState::getInstance())
+            {
+                continue;
+            }
+
+            if (e->getWorldAABB().intersects(*playerAABB))
+            {
+                glfwSetWindowShouldClose(window, true);
+            }
+
             e->getModel()->getShader()->use();
             e->getModel()->getShader()->setMat4("mvp", glm::value_ptr(projection * view * e->getModel()->getModelMatrix()));
             e->update(deltaTime);
 
             // Text render
-            if (e->getStateMachine().getCurrentState() == &EnemyDieState::getInstance())
-            {
-                continue; // Skip rendering if the enemy is dead
-            }
-
             glm::vec3 pos = e->getModel()->getPosition();
             glm::vec4 clipSpace = projection * view * glm::vec4(pos, 1.0f);
             if (clipSpace.w > 0.0f)
@@ -107,15 +154,14 @@ int main()
                         wordWidth += (chars.at(c).advance >> 6) * scale;
                 }
 
-                float x = (ndc.x * 0.5f + 0.5f) * Global::screenWidth - wordWidth / 2.0f;
-                float y = (ndc.y * 0.5f + 0.5f) * Global::screenHeight - 50.0f;
+                float x = (ndc.x * 0.5f + 0.5f) * Global::getInstance().screenWidth - wordWidth / 2.0f;
+                float y = (ndc.y * 0.5f + 0.5f) * Global::getInstance().screenHeight - 50.0f;
 
                 text.renderText(word, x, y, scale, glm::vec3(0.1f, 0.1f, 0.1f));
             }
         }
 
-        // Render typed word ở dưới cùng
-        std::string typed = Global::currentTypedWord;
+        std::string typed = Global::getInstance().player.currentTypedWord;
         float scale = 1.0f, width = 0.0f;
         const auto &chars = text.getCharacters();
         for (char c : typed)
@@ -123,7 +169,7 @@ int main()
             if (chars.count(c))
                 width += (chars.at(c).advance >> 6) * scale;
         }
-        float x = (Global::screenWidth - width) / 2.0f;
+        float x = (Global::getInstance().screenWidth - width) / 2.0f;
         float y = 50.0f;
         text.renderText(typed, x, y, scale, glm::vec3(0.2f, 0.2f, 0.2f));
 
@@ -136,6 +182,8 @@ int main()
 
     delete[] vertices;
     delete[] indices;
+    delete playerAABB;
+    deleteTriangleMesh();
 
     glfwTerminate();
     return 0;

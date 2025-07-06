@@ -5,12 +5,12 @@
 #include "spawn_enemy.h"
 
 void checkWord() {
-    for (auto &e : Global::enemies)
+    for (auto &e : Global::getInstance().enemy.enemies)
     {
-        if (e->getWord() == Global::currentTypedWord)
+        if (e->getWord() == Global::getInstance().player.currentTypedWord)
         {
             e->getStateMachine().changeState(&EnemyDieState::getInstance());
-            trySpawnOneEnemy(Global::playerPosition);
+            Global::getInstance().enemy.numberOfEnemies++;
         }
     }
 }

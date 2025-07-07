@@ -34,6 +34,7 @@ void EnemyMoveState::update(EnemyAbstract *enemy, float deltaTime)
     enemy->updateModelRotation(deltaTime);
     enemy->move(deltaTime);
     enemy->draw();
+    enemy->drawText();
 }
 void EnemyMoveState::exit(EnemyAbstract *enemy)
 {
@@ -70,15 +71,14 @@ void EnemyRespawnState::enter(EnemyAbstract *enemy)
     enemy->setMaxSpeed(0.5f);
     enemy->setAccelerationRate(3.0f);
 
-    float x = -2.0f + static_cast<float>(rand()) / RAND_MAX * 4.0f;
-    float y = sqrt(4.0f - x * x) * (rand() % 2 == 0 ? 1.0f : -1.0f);
+    float x = -3.0f + static_cast<float>(rand()) / RAND_MAX * 6.0f;
+    float y = sqrt(9.0f - x * x) * (rand() % 2 == 0 ? 1.0f : -1.0f);
     glm::vec3 spawnPos(x, y, 0.0f);
     enemy->getModel()->setPosition(spawnPos);
     enemy->setDirection(glm::normalize(Global::getInstance().player.position - spawnPos));
 }
 void EnemyRespawnState::update(EnemyAbstract *enemy, float deltaTime)
 {
-    enemy->draw();
     enemy->changeState(&EnemyMoveState::getInstance());
 }
 void EnemyRespawnState::exit(EnemyAbstract *enemy)

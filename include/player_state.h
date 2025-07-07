@@ -5,7 +5,7 @@
 
 class PlayerIdleState : public State<Player>
 {
-public: 
+public:
     static PlayerIdleState &getInstance();
 
     void enter(Player *enemy) override;
@@ -14,4 +14,17 @@ public:
 
 private:
     PlayerIdleState();
+};
+
+class PlayerDieState : public State<Player>
+{
+public:
+    static PlayerDieState &getInstance();
+
+    void enter(Player *enemy) override;
+    void update(Player *enemy, float deltaTime) override;
+    void exit(Player *enemy) override;
+
+private:
+    PlayerDieState();
 };

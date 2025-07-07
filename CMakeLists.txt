@@ -14,10 +14,10 @@ file(GLOB_RECURSE SRC_FILES src/*.cpp)
 list(REMOVE_ITEM SRC_FILES "${CMAKE_SOURCE_DIR}/src/glad.c")
 
 file(GLOB LIBFILES "${CMAKE_SOURCE_DIR}/lib/*.lib")
-message(STATUS "Found .lib files:")
-foreach(lib ${LIBFILES})
-    message(STATUS "  ${lib}")
-endforeach()
+# message(STATUS "Found .lib files:")
+# foreach(lib ${LIBFILES})
+#     message(STATUS "  ${lib}")
+# endforeach()
 
 set(SOURCES main.cpp ${SRC_FILES})
 

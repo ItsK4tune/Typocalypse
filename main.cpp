@@ -2,8 +2,6 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <cstdlib>
 #include <ctime>
-#include <algorithm> // std::shuffle
-#include <random>
 
 #include "global.h"
 #include "camera.h"
@@ -11,6 +9,7 @@
 #include "enemy.h"
 #include "enemy_state.h"
 #include "global_state.h"
+#include "player.h"
 
 #include "utilities/init.h"
 #include "utilities/genMesh.h"
@@ -20,36 +19,12 @@
 
 AABB *playerAABB = new AABB(glm::vec3(-0.05f, -0.05f, 0.0f), glm::vec3(0.05f, 0.05f, 0.0f));
 
-void respawnRandomEnemy()
-{
-    auto &enemies = Global::getInstance().enemy.enemies;
-
-    std::vector<std::shared_ptr<CreepEnemy>> deadEnemies;
-    for (auto &e : enemies)
-    {
-        if (e->getStateMachine().getCurrentState() == &EnemyDieState::getInstance())
-        {
-            deadEnemies.push_back(e);
-        }
-    }
-
-    if (!deadEnemies.empty())
-    {
-        std::shuffle(deadEnemies.begin(), deadEnemies.end(), std::default_random_engine(static_cast<unsigned int>(time(nullptr))));
-
-        auto &chosen = deadEnemies.front();
-        chosen->changeState(&EnemyRespawnState::getInstance());
-    }
-}
-
 int main()
 {
     srand(static_cast<unsigned int>(time(nullptr)));
     GLFWwindow *window = createWindow(Global::getInstance().screenWidth, Global::getInstance().screenHeight, "Typocalypse");
 
-    // text renderer
-    TextRenderer text(Global::getInstance().screenWidth, Global::getInstance().screenHeight);
-    text.load("../resources/fonts/TimesRegular.ttf", Global::getInstance().screenWidth / 48);
+    Global::getInstance().initText();
 
     initTriangleMesh();
 
@@ -58,15 +33,25 @@ int main()
     GLuint *indices = nullptr;
     unsigned int vertexCount = 0;
     unsigned int indexCount = 0;
-
     generateCircleMesh(vertices, indices, vertexCount, indexCount, 64, 0.05f);
-    Model model(vertices, vertexCount, indices, indexCount);
+    auto model = std::make_shared<Model>(vertices, vertexCount, indices, indexCount);
     Shader shader("basic.vert", "basic.frag");
-    model.setShader(std::make_shared<Shader>(shader));
+    model->setShader(std::make_shared<Shader>(shader));
+    auto player = std::make_shared<Player>(model);
 
+    // enemy
     std::vector<std::string> wordList = {"cat", "dog", "fish", "bird", "mouse", "elephant", "giraffe", "lion", "tiger", "bear",
                                          "zebra", "monkey", "kangaroo", "panda", "rabbit", "fox", "wolf", "deer", "cow", "sheep"};
     initEnemyPool(wordList, shader);
+
+    // bullet
+    Vertex *bulletVertices = nullptr;
+    GLuint *bulletIndices = nullptr;
+    unsigned int bulletVertexCount = 0;
+    unsigned int bulletIndexCount = 0;
+    generateRectangleMesh(bulletVertices, bulletIndices, bulletVertexCount, bulletIndexCount, 0.1f, 0.1f);
+    auto bulletModel = std::make_shared<Model>(bulletVertices, bulletVertexCount, bulletIndices, bulletIndexCount);
+    Global::getInstance().bulletPool.init(20, bulletModel);
 
     double lastTime = glfwGetTime();
     float lastFrame = glfwGetTime();
@@ -101,18 +86,6 @@ int main()
         Global::getInstance().update(deltaTime);
         if (Global::getInstance().stateMachine.getCurrentState() == &GlobalMenuState::getInstance())
         {
-            std::string typed = "Play Typocalypse";
-            float scale = 1.0f, width = 0.0f;
-            const auto &chars = text.getCharacters();
-            for (char c : typed)
-            {
-                if (chars.count(c))
-                    width += (chars.at(c).advance >> 6) * scale;
-            }
-            float x = (Global::getInstance().screenWidth - width) / 2.0f;
-            float y = Global::getInstance().screenHeight / 2.0f;
-            text.renderText(typed, x, y, scale, glm::vec3(0.2f, 0.2f, 0.2f));
-
             glfwSwapBuffers(window);
             glfwPollEvents();
             continue;
@@ -123,16 +96,10 @@ int main()
         glm::mat4 view = Global::getInstance().camera->getViewMatrix();
 
         // Draw player
-        glm::mat4 mvp = projection * view * model.getModelMatrix();
-        model.getShader()->use();
-        model.getShader()->setMat4("mvp", glm::value_ptr(mvp));
-        model.draw();
-
-        if (Global::getInstance().enemy.numberOfEnemies > 0)
-        {
-            respawnRandomEnemy();
-            Global::getInstance().enemy.numberOfEnemies--;
-        }
+        glm::mat4 mvp = projection * view * player->getModel()->getModelMatrix();
+        player->getModel()->getShader()->use();
+        player->getModel()->getShader()->setMat4("mvp", glm::value_ptr(mvp));
+        player->update(deltaTime);
 
         for (auto &e : Global::getInstance().enemy.enemies)
         {
@@ -149,34 +116,11 @@ int main()
             e->getModel()->getShader()->use();
             e->getModel()->getShader()->setMat4("mvp", glm::value_ptr(projection * view * e->getModel()->getModelMatrix()));
             e->update(deltaTime);
-
-            // Text render
-            glm::vec3 pos = e->getModel()->getPosition();
-            glm::vec4 clipSpace = projection * view * glm::vec4(pos, 1.0f);
-            if (clipSpace.w > 0.0f)
-            {
-                glm::vec3 ndc = glm::vec3(clipSpace) / clipSpace.w;
-
-                std::string word = e->getWord();
-                float scale = 0.7f;
-                float wordWidth = 0.0f;
-                const auto &chars = text.getCharacters();
-                for (char c : word)
-                {
-                    if (chars.count(c))
-                        wordWidth += (chars.at(c).advance >> 6) * scale;
-                }
-
-                float x = (ndc.x * 0.5f + 0.5f) * Global::getInstance().screenWidth - wordWidth / 2.0f;
-                float y = (ndc.y * 0.5f + 0.5f) * Global::getInstance().screenHeight - 50.0f;
-
-                text.renderText(word, x, y, scale, glm::vec3(0.1f, 0.1f, 0.1f));
-            }
         }
 
         std::string typed = Global::getInstance().player.currentTypedWord;
         float scale = 1.0f, width = 0.0f;
-        const auto &chars = text.getCharacters();
+        const auto &chars = Global::getInstance().text->getCharacters();
         for (char c : typed)
         {
             if (chars.count(c))
@@ -184,7 +128,7 @@ int main()
         }
         float x = (Global::getInstance().screenWidth - width) / 2.0f;
         float y = 50.0f;
-        text.renderText(typed, x, y, scale, glm::vec3(0.2f, 0.2f, 0.2f));
+        Global::getInstance().text->renderText(typed, x, y, scale, glm::vec3(0.2f, 0.2f, 0.2f));
 
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
             glfwSetWindowShouldClose(window, true);

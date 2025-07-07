@@ -1,4 +1,5 @@
 #include "global_state.h"
+#include "utilities/spawn_enemy.h"
 
 GlobalMenuState::GlobalMenuState() {}
 GlobalMenuState &GlobalMenuState::getInstance()
@@ -12,10 +13,12 @@ void GlobalMenuState::enter(Global *global)
 }
 void GlobalMenuState::update(Global *global, float deltaTime)
 {
-    if (global->game.isMousePressed && 
-        global->game.mouseX >= 0 && 
-        global->game.mouseX <= global->screenWidth && 
-        global->game.mouseY >= 0 && 
+    global->drawText();
+
+    if (global->game.isMousePressed &&
+        global->game.mouseX >= 0 &&
+        global->game.mouseX <= global->screenWidth &&
+        global->game.mouseY >= 0 &&
         global->game.mouseY <= global->screenHeight)
     {
         printf("Mouse pressed, changing to play state\n");
@@ -40,11 +43,18 @@ void GlobalPlayState::update(Global *global, float deltaTime)
 {
     static float elapsedTime = 0.0f;
     elapsedTime += deltaTime;
-    if (elapsedTime >= 30.0f)
+    if (elapsedTime >= 10.0f)
     {
         elapsedTime = 0.0f;
-        global->enemy.numberOfEnemies += 3;
-        printf("Number of enemies increased to: %d\n", global->enemy.numberOfEnemies);
+        global->enemy.maxEnemyCount += 1;
+    }
+
+    Global::getInstance().enemy.updateCurrentEnemyCount();
+    while (Global::getInstance().enemy.currentEnemyCount < Global::getInstance().enemy.maxEnemyCount)
+    {
+        if (!respawnRandomEnemy())
+            break;
+        Global::getInstance().enemy.currentEnemyCount++;
     }
 }
 void GlobalPlayState::exit(Global *global)

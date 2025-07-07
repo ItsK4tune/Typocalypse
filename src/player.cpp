@@ -23,3 +23,8 @@ void Player::update(float deltaTime)
 {
     stateMachine.update(deltaTime);
 }
+
+void Player::draw()
+{
+    model->draw();
+}

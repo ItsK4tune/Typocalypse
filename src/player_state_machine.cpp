@@ -4,5 +4,5 @@
 PlayerStateMachine::PlayerStateMachine(Player *e)
     : StateMachine<Player>(e)
 {
-    // changeState(&EnemyDieState::getInstance());
+    changeState(&PlayerIdleState::getInstance());
 }

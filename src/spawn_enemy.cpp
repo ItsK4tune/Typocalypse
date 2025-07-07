@@ -8,6 +8,8 @@
 #include "global.h"
 #include "enemy_state.h"
 
+#include <random>
+#include <algorithm>
 #include <cstdlib>
 #include <cmath>
 
@@ -51,7 +53,32 @@ void initEnemyPool(const std::vector<std::string> &wordList, const Shader &shade
     }
 }
 
-void deleteTriangleMesh() {
+bool respawnRandomEnemy()
+{
+    auto &enemies = Global::getInstance().enemy.enemies;
+    std::vector<std::shared_ptr<CreepEnemy>> deadEnemies;
+
+    for (auto &e : enemies)
+    {
+        if (e->getStateMachine().getCurrentState() == &EnemyDieState::getInstance())
+        {
+            deadEnemies.push_back(e);
+        }
+    }
+
+    if (!deadEnemies.empty())
+    {
+        std::shuffle(deadEnemies.begin(), deadEnemies.end(), std::default_random_engine(static_cast<unsigned int>(time(nullptr))));
+        auto &chosen = deadEnemies.front();
+        chosen->changeState(&EnemyRespawnState::getInstance());
+        return true;
+    }
+
+    return false;
+}
+
+void deleteTriangleMesh()
+{
     delete[] enemyVertices;
     delete[] enemyIndices;
     enemyVertices = nullptr;

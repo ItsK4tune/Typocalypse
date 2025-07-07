@@ -42,6 +42,7 @@ public:
     virtual void updateModelRotation(float deltaTime) = 0;
     virtual void move(float deltaTime) = 0;
     virtual void draw() = 0;
+    virtual void drawText() = 0;
 };
 
 class CreepEnemy : public EnemyAbstract
@@ -99,6 +100,7 @@ public:
     void updateModelRotation(float deltaTime) override;
     void move(float deltaTime) override;
     void draw() override;
+    void drawText() override;
 
 private:
     EnemyStateMachine stateMachine;

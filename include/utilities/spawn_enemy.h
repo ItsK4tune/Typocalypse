@@ -9,6 +9,7 @@ class Shader;
 class CreepEnemy;
 
 void initTriangleMesh();
-void initEnemyPool(const std::vector<std::string>& wordList, const Shader& shader);
+void initEnemyPool(const std::vector<std::string> &wordList, const Shader &shader);
+bool respawnRandomEnemy();
 
 void deleteTriangleMesh();

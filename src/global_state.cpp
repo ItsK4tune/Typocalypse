@@ -1,7 +1,5 @@
 #include "global_state.h"
 
-auto& global = Global::getInstance();
-
 GlobalMenuState::GlobalMenuState() {}
 GlobalMenuState &GlobalMenuState::getInstance()
 {
@@ -9,24 +7,24 @@ GlobalMenuState &GlobalMenuState::getInstance()
     return instance;
 }
 void GlobalMenuState::enter(Global *global)
-{   
+{
     printf("Entering GlobalMenuState\n");
 }
 void GlobalMenuState::update(Global *global, float deltaTime)
 {
-    // Simulate some menu logic, e.g., waiting for user input
-    static float elapsedTime = 0.0f;
-    elapsedTime += deltaTime;
-    
-    if (elapsedTime >= 5.0f) // After 5 seconds, switch to play state
+    if (global->game.isMousePressed && 
+        global->game.mouseX >= 0 && 
+        global->game.mouseX <= global->screenWidth && 
+        global->game.mouseY >= 0 && 
+        global->game.mouseY <= global->screenHeight)
     {
-        elapsedTime = 0.0f;
+        printf("Mouse pressed, changing to play state\n");
         global->changeState(&GlobalPlayState::getInstance());
-        printf("Switching to GlobalPlayState\n");
     }
 }
 void GlobalMenuState::exit(Global *global)
 {
+    global->game.isMousePressed = false;
 }
 
 GlobalPlayState::GlobalPlayState() {}
@@ -36,8 +34,7 @@ GlobalPlayState &GlobalPlayState::getInstance()
     return instance;
 }
 void GlobalPlayState::enter(Global *global)
-{   
-
+{
 }
 void GlobalPlayState::update(Global *global, float deltaTime)
 {
@@ -53,5 +50,3 @@ void GlobalPlayState::update(Global *global, float deltaTime)
 void GlobalPlayState::exit(Global *global)
 {
 }
-
-

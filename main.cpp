@@ -49,7 +49,7 @@ int main()
 
     // text renderer
     TextRenderer text(Global::getInstance().screenWidth, Global::getInstance().screenHeight);
-    text.load("../resources/fonts/TimesRegular.ttf", 48);
+    text.load("../resources/fonts/TimesRegular.ttf", Global::getInstance().screenWidth / 48);
 
     initTriangleMesh();
 
@@ -101,9 +101,22 @@ int main()
         Global::getInstance().update(deltaTime);
         if (Global::getInstance().stateMachine.getCurrentState() == &GlobalMenuState::getInstance())
         {
+            std::string typed = "Play Typocalypse";
+            float scale = 1.0f, width = 0.0f;
+            const auto &chars = text.getCharacters();
+            for (char c : typed)
+            {
+                if (chars.count(c))
+                    width += (chars.at(c).advance >> 6) * scale;
+            }
+            float x = (Global::getInstance().screenWidth - width) / 2.0f;
+            float y = Global::getInstance().screenHeight / 2.0f;
+            text.renderText(typed, x, y, scale, glm::vec3(0.2f, 0.2f, 0.2f));
+
+            glfwSwapBuffers(window);
+            glfwPollEvents();
             continue;
         }
-        
 
         // Set matrices
         glm::mat4 projection = Global::getInstance().camera->getPerspectiveProjection(45.0f, (float)Global::getInstance().screenWidth / Global::getInstance().screenHeight, 0.1f, 100.0f);

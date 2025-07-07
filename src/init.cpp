@@ -35,6 +35,8 @@ GLFWwindow *createWindow(int width, int height, const char *title)
     glfwSetCharCallback(window, character_callback);
     glfwSetKeyCallback(window, key_callback);
     glfwSetCursorPosCallback(window, cursor_position_callback);
+    glfwSetMouseButtonCallback(window, mouse_button_callback);
+    glfwSetScrollCallback(window, scroll_callback);
 
     return window;
 }
@@ -69,7 +71,25 @@ void cursor_position_callback(GLFWwindow *window, double xpos, double ypos)
 {
     Global::getInstance().game.mouseX = static_cast<int>(xpos);
     Global::getInstance().game.mouseY = static_cast<int>(ypos);
-    Global::getInstance().game.isMousePressed = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
+}
+
+void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
+{
+    if (button == GLFW_MOUSE_BUTTON_LEFT)
+    {
+        Global::getInstance().game.isMousePressed = (action == GLFW_PRESS);
+    }
+}
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    auto& global = Global::getInstance();
+    
+    glm::vec3 pos = global.camera->getPosition();
+    pos.z += static_cast<float>(-yoffset) * 0.2f;
+    if (pos.z < 3.0f) pos.z = 3.0f;
+    if (pos.z > 10.0f) pos.z = 10.0f;
+    global.camera->setPosition(pos);
 }
 
 void terminate(GLFWwindow *window)

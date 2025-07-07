@@ -1,5 +1,4 @@
 #include "enemy_state.h"
-
 #include "global.h"
 
 EnemyFreezeState::EnemyFreezeState() {}

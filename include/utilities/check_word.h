@@ -2,7 +2,6 @@
 
 #include "global/global.h"
 #include "enemy/enemy_state.h"
-#include "spawn_enemy.h"
 
 void checkWord()
 {

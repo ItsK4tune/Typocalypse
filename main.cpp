@@ -16,7 +16,6 @@
 #include "utilities/init.h"
 #include "utilities/genMesh.h"
 #include "utilities/text_renderer.h"
-#include "utilities/spawn_enemy.h"
 #include "utilities/AABB.h"
 
 int main()
@@ -66,6 +65,9 @@ int main()
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+            glfwSetWindowShouldClose(window, true);
+
         Global::getInstance().update(deltaTime);
         if (Global::getInstance().stateMachine.getCurrentState() == &GlobalMenuState::getInstance())
         {
@@ -74,12 +76,10 @@ int main()
             continue;
         }
 
-        if (Global::getInstance().stateMachine.getCurrentState() == &GlobalGameOverState::getInstance()){
+        if (Global::getInstance().stateMachine.getCurrentState() == &GlobalGameOverState::getInstance())
+        {
             glfwSetWindowShouldClose(window, true);
         }
-
-        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-            glfwSetWindowShouldClose(window, true);
 
         glfwSwapBuffers(window);
         glfwPollEvents();

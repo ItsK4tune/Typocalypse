@@ -1,5 +1,4 @@
 #include "global/global_state.h"
-#include "utilities/spawn_enemy.h"
 
 GlobalMenuState::GlobalMenuState() {}
 GlobalMenuState &GlobalMenuState::getInstance()

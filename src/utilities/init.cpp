@@ -48,21 +48,21 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height)
 
 void character_callback(GLFWwindow *window, unsigned int codepoint)
 {
-    Global::getInstance().player.currentTypedWord += static_cast<char>(codepoint);
+    Global::getInstance().playerData.currentTypedWord += static_cast<char>(codepoint);
 }
 
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
     if (action == GLFW_PRESS || action == GLFW_REPEAT)
     {
-        if (key == GLFW_KEY_BACKSPACE && !Global::getInstance().player.currentTypedWord.empty())
+        if (key == GLFW_KEY_BACKSPACE && !Global::getInstance().playerData.currentTypedWord.empty())
         {
-            Global::getInstance().player.currentTypedWord.pop_back();
+            Global::getInstance().playerData.currentTypedWord.pop_back();
         }
         else if (key == GLFW_KEY_ENTER || key == GLFW_KEY_SPACE)
         {
             checkWord();
-            Global::getInstance().player.currentTypedWord.clear();
+            Global::getInstance().playerData.currentTypedWord.clear();
         }
     }
 }

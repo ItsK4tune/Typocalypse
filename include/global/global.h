@@ -8,6 +8,7 @@
 #include "pool/creep_enemy_pool.h"
 #include "pool/bullet_pool.h"
 #include "utilities/text_renderer.h"
+#include "global/player_data.h"
 
 class GameAttribute
 {
@@ -25,13 +26,6 @@ public:
     bool isMousePressed = false;
 };
 
-class PlayerData
-{
-public:
-    glm::vec3 position = glm::vec3(0.0f);
-    std::string currentTypedWord;
-};
-
 class Global
 {
 public:
@@ -45,7 +39,7 @@ public:
     Global &operator=(const Global &) = delete;
 
     GameAttribute attribute;
-    PlayerData player;
+    PlayerData playerData;
     GameManager game;
     CreepEnemyPool enemy;
     BulletPool bulletPool;

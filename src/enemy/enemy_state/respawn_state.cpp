@@ -18,7 +18,7 @@ void EnemyRespawnState::enter(EnemyAbstract *enemy)
     float y = sqrt(9.0f - x * x) * (rand() % 2 == 0 ? 1.0f : -1.0f);
     glm::vec3 spawnPos(x, y, 0.0f);
     enemy->getModel()->setPosition(spawnPos);
-    enemy->setDirection(glm::normalize(Global::getInstance().player.position - spawnPos));
+    enemy->setDirection(glm::normalize(Global::getInstance().playerData.player->getModel()->getPosition() - spawnPos));
 }
 void EnemyRespawnState::update(EnemyAbstract *enemy, float deltaTime)
 {

@@ -6,20 +6,19 @@
 
 void checkWord()
 {
-    auto &global = Global::getInstance();
-    for (auto &e : global.enemy.enemies)
+    for (auto &e : Global::getInstance().enemy.enemies)
     {
         if (e->getStateMachine().getCurrentState() == &EnemyDieState::getInstance())
             continue;
 
-        if (e->getWord() == global.player.currentTypedWord)
+        if (e->getWord() == Global::getInstance().playerData.currentTypedWord)
         {
             std::shared_ptr<EnemyAbstract> target = e;
-            Bullet *bullet = global.bulletPool.spawn(global.player.position, target);
+            Bullet *bullet = Global::getInstance().bulletPool.spawn(Global::getInstance().playerData.player->getModel()->getPosition(), target);
             e->changeState(&EnemyFreezeState::getInstance());
             break;
         }
     }
 
-    global.player.currentTypedWord.clear();
+    Global::getInstance().playerData.currentTypedWord.clear();
 }

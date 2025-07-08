@@ -12,7 +12,7 @@ class Model
 {
 public:
     Model();
-    Model(std::shared_ptr<std::vector<Vertex>> vertices, unsigned int vertexCount, std::shared_ptr<std::vector<GLuint>> indices, unsigned int indexCount);
+    Model(std::shared_ptr<std::vector<Vertex>> vertices, std::shared_ptr<std::vector<GLuint>> indices);
     Model(const char *path);
     ~Model();
 
@@ -27,7 +27,7 @@ public:
     void setScale(const glm::vec3 &scl) { scale = scl; }
 
     void loadModel(const char *path);
-    void loadVertexData(std::shared_ptr<std::vector<Vertex>> vertices, unsigned int vertexCount, std::shared_ptr<std::vector<GLuint>> indices, unsigned int indexCount);
+    void loadVertexData(std::shared_ptr<std::vector<Vertex>> vertices, std::shared_ptr<std::vector<GLuint>> indices);
     void initialize();
     void cleanup();
     void draw();
@@ -37,8 +37,6 @@ private:
     unsigned int VAO, VBO, EBO;
     std::shared_ptr<std::vector<Vertex>> vertices;
     std::shared_ptr<std::vector<GLuint>> indices;
-    unsigned int vertexCount;
-    unsigned int indexCount;
     std::shared_ptr<Shader> shader;
 
     glm::vec3 position{0.0f};

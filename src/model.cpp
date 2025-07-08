@@ -4,20 +4,20 @@
 #include <sstream>
 
 Model::Model()
-    : vertices(std::make_shared<std::vector<Vertex>>()), indices(std::make_shared<std::vector<GLuint>>()), vertexCount(0), indexCount(0), shader(nullptr),
+    : vertices(std::make_shared<std::vector<Vertex>>()), indices(std::make_shared<std::vector<GLuint>>()), shader(nullptr),
       VAO(0), VBO(0), EBO(0)
 {
 }
 
-Model::Model(std::shared_ptr<std::vector<Vertex>> vertices, unsigned int vertexCount, std::shared_ptr<std::vector<GLuint>> indices, unsigned int indexCount)
-    : vertices(vertices), vertexCount(vertexCount), indices(indices), indexCount(indexCount), shader(nullptr),
+Model::Model(std::shared_ptr<std::vector<Vertex>> vertices, std::shared_ptr<std::vector<GLuint>> indices)
+    : vertices(vertices), indices(indices), shader(nullptr),
       VAO(0), VBO(0), EBO(0)
 {
     initialize();
 }
 
 Model::Model(const char *path)
-    : vertices(nullptr), indices(nullptr), vertexCount(0), indexCount(0), shader(nullptr),
+    : vertices(nullptr), indices(nullptr), shader(nullptr),
       VAO(0), VBO(0), EBO(0)
 {
     loadModel(path);
@@ -34,22 +34,23 @@ void Model::loadModel(const char *path)
     std::cerr << "[Model::loadModel] not implement yet.\n";
 }
 
-void Model::loadVertexData(std::shared_ptr<std::vector<Vertex>> vertices, unsigned int vertexCount, std::shared_ptr<std::vector<GLuint>> indices, unsigned int indexCount)
+void Model::loadVertexData(std::shared_ptr<std::vector<Vertex>> vertices, std::shared_ptr<std::vector<GLuint>> indices)
 {
     this->vertices = vertices;
-    this->vertexCount = vertexCount;
     this->indices = indices;
-    this->indexCount = indexCount;
     initialize();
 }
 
 void Model::initialize()
 {
-    if (!vertices || !indices || vertexCount == 0 || indexCount == 0)
+    if (!vertices || !indices)
     {
         std::cerr << "[Model::initialize] vertex/index data not valid.\n";
         return;
     }
+
+    GLuint vertexCount = static_cast<unsigned int>(vertices->size());
+    GLuint indexCount = static_cast<unsigned int>(indices->size());
 
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
@@ -97,6 +98,8 @@ void Model::draw()
         std::cerr << "[Model::draw] Shader not set.\n";
         return;
     }
+
+    GLuint indexCount = static_cast<unsigned int>(indices->size());
 
     shader->use();
     glBindVertexArray(VAO);

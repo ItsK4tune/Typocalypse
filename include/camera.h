@@ -19,9 +19,7 @@ public:
     void setUp(const glm::vec3 &u) { up = glm::normalize(u); }
 
     glm::mat4 getViewMatrix() const;
-
     glm::mat4 getPerspectiveProjection(float fov, float aspect, float near, float far) const;
-
     glm::mat4 getOrthoProjection(float left, float right, float bottom, float top, float near, float far) const;
 
 private:

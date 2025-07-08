@@ -13,6 +13,47 @@ CreepEnemy::~CreepEnemy()
     }
 }
 
+void CreepEnemy::setDirection(const glm::vec3 &dir) { direction = glm::normalize(dir); }
+void CreepEnemy::setVelocity(const glm::vec3 &vel) { velocity = vel; }
+void CreepEnemy::setAcceleration(const glm::vec3 &acc) { acceleration = acc; }
+void CreepEnemy::setMaxSpeed(float speed) { maxSpeed = speed; }
+void CreepEnemy::setAccelerationRate(float rate) { accelerationRate = rate; }
+void CreepEnemy::setWord(const std::string &w) { word = w; }
+void CreepEnemy::setLocalAABB(const AABB &box) { localAABB = box; }
+
+std::shared_ptr<Model> CreepEnemy::getModel() const { return model; }
+EnemyStateMachine &CreepEnemy::getStateMachine() { return stateMachine; }
+glm::vec3 CreepEnemy::getDirection() const { return direction; }
+glm::vec3 CreepEnemy::getVelocity() const { return velocity; }
+glm::vec3 CreepEnemy::getAcceleration() const { return acceleration; }
+float CreepEnemy::getMaxSpeed() const { return maxSpeed; }
+float CreepEnemy::getAccelerationRate() const { return accelerationRate; }
+const std::string &CreepEnemy::getWord() const { return word; }
+const AABB &CreepEnemy::getLocalAABB() const { return localAABB; }
+AABB CreepEnemy::getWorldAABB() const
+{
+    glm::mat4 modelMat = model->getModelMatrix();
+    glm::vec3 corners[8] = {
+        localAABB.min,
+        glm::vec3(localAABB.min.x, localAABB.min.y, localAABB.max.z),
+        glm::vec3(localAABB.min.x, localAABB.max.y, localAABB.min.z),
+        glm::vec3(localAABB.min.x, localAABB.max.y, localAABB.max.z),
+        glm::vec3(localAABB.max.x, localAABB.min.y, localAABB.min.z),
+        glm::vec3(localAABB.max.x, localAABB.min.y, localAABB.max.z),
+        glm::vec3(localAABB.max.x, localAABB.max.y, localAABB.min.z),
+        localAABB.max};
+
+    glm::vec3 minPt(FLT_MAX), maxPt(-FLT_MAX);
+    for (int i = 0; i < 8; ++i)
+    {
+        glm::vec3 transformed = glm::vec3(modelMat * glm::vec4(corners[i], 1.0f));
+        minPt = glm::min(minPt, transformed);
+        maxPt = glm::max(maxPt, transformed);
+    }
+
+    return AABB(minPt, maxPt);
+}
+
 void CreepEnemy::update(float deltaTime)
 {
     stateMachine.update(deltaTime);

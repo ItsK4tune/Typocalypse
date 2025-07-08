@@ -1,5 +1,4 @@
 #include "global/global_state.h"
-#include "utilities/spawn_enemy.h"
 
 GlobalPlayState::GlobalPlayState() {}
 GlobalPlayState &GlobalPlayState::getInstance()
@@ -23,7 +22,7 @@ void GlobalPlayState::update(Global *global, float deltaTime)
     Global::getInstance().enemy.updateCurrentEnemyCount();
     while (Global::getInstance().enemy.currentEnemyCount < Global::getInstance().enemy.maxEnemyCount)
     {
-        if (!respawnRandomEnemy())
+        if (global->enemy.spawn() != nullptr)
             break;
         Global::getInstance().enemy.currentEnemyCount++;
     }

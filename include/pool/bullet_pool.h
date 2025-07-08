@@ -10,17 +10,15 @@
 class BulletPool
 {
 public:
-    ~BulletPool();
     std::vector<std::shared_ptr<Bullet>> bullets;
 
     void init(size_t count, const Shader &shader);
     Bullet *spawn(const glm::vec3 &pos, const std::shared_ptr<EnemyAbstract> &target);
+    void clear();
 
 private:
-    Vertex *bulletVertices = nullptr;
-    GLuint *bulletIndices = nullptr;
-    unsigned int bulletVertexCount = 0;
-    unsigned int bulletIndexCount = 0;
+    std::shared_ptr<std::vector<Vertex>> bulletVertices;
+    std::shared_ptr<std::vector<GLuint>> bulletIndices;
 
     AABB initRectangleMesh();
 };

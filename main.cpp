@@ -1,3 +1,4 @@
+#include <memory>
 #include <sstream>
 #include <glm/gtc/type_ptr.hpp>
 #include <cstdlib>
@@ -27,27 +28,23 @@ int main()
 
     Global::getInstance().initText();
 
-    initTriangleMesh();
-
     // player
-    Vertex *vertices = nullptr;
-    GLuint *indices = nullptr;
-    unsigned int vertexCount = 0;
-    unsigned int indexCount = 0;
-    generateCircleMesh(vertices, indices, vertexCount, indexCount, 64, 0.05f);
-    auto model = std::make_shared<Model>(vertices, vertexCount, indices, indexCount);
-    Shader shader("basic.vert", "basic.frag");
-    model->setShader(std::make_shared<Shader>(shader));
+    std::shared_ptr<std::vector<Vertex>> vertices = std::make_shared<std::vector<Vertex>>();
+    std::shared_ptr<std::vector<GLuint>> indices = std::make_shared<std::vector<GLuint>>();
+    generateCircleMesh(vertices, indices, 64, 0.05f, glm::vec3(1.0f, 0.0f, 0.0f));
+    auto model = std::make_shared<Model>(vertices, indices);
+    Shader playerShader("basic.vert", "basic.frag");
+    model->setShader(std::make_shared<Shader>(playerShader));
     auto player = std::make_shared<Player>(model);
 
     // enemy
     std::vector<std::string> wordList = {"cat", "dog", "fish", "bird", "mouse", "elephant", "giraffe", "lion", "tiger", "bear",
                                          "zebra", "monkey", "kangaroo", "panda", "rabbit", "fox", "wolf", "deer", "cow", "sheep"};
-    initEnemyPool(wordList, shader);
 
     // bullet
-    Shader bulletShader("basic.vert", "basic.frag");
-    Global::getInstance().bulletPool.init(20, bulletShader);
+    Shader shader("basic.vert", "basic.frag");
+    Global::getInstance().bulletPool.init(20, shader);
+    Global::getInstance().enemy.init(100, shader, wordList);
 
     float lastTime = glfwGetTime();
     float lastFrame = glfwGetTime();
@@ -150,10 +147,7 @@ int main()
         glfwPollEvents();
     }
 
-    delete[] vertices;
-    delete[] indices;
     delete playerAABB;
-    deleteTriangleMesh();
 
     glfwTerminate();
     return 0;

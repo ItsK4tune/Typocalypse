@@ -1,9 +1,9 @@
-#include <cmath>
-#include <glm/glm.hpp>
-#include <glm/gtc/constants.hpp>
+#include <memory>
+#include <vector>
 #include <glad/glad.h>
+#include <glm/glm.hpp>
 #include "vertex.h"
 
-void generateCircleMesh(Vertex *&outVertices, GLuint *&outIndices, unsigned int &vertexCount, unsigned int &indexCount, int segments, float radius);
-void generateRectangleMesh(Vertex *&vertices, GLuint *&indices, unsigned int &vertexCount, unsigned int &indexCount, float width, float height, glm::vec3 color);
-void generatetriangleMesh(Vertex *&vertices, GLuint *&indices, unsigned int &vertexCount, unsigned int &indexCount, float headLength, float tailLength, glm::vec3 color);
+void generateCircleMesh(std::shared_ptr<std::vector<Vertex>> &vertices, std::shared_ptr<std::vector<GLuint>> &indices, int segments, float radius, glm::vec3 color);
+void generateRectangleMesh(std::shared_ptr<std::vector<Vertex>> &vertices, std::shared_ptr<std::vector<GLuint>> &indices, float width, float height, glm::vec3 color);
+void generatetriangleMesh(std::shared_ptr<std::vector<Vertex>> &vertices, std::shared_ptr<std::vector<GLuint>> &indices, float headLength, float tailLength, glm::vec3 color);

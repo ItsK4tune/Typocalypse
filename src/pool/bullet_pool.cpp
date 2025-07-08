@@ -1,11 +1,9 @@
+#include <glm/glm.hpp>
+#include <iostream>
+
 #include "pool/bullet_pool.h"
 #include "bullet/bullet_state.h"
 #include "utilities/genMesh.h"
-
-BulletPool::~BulletPool(){
-    delete bulletVertices;
-    delete bulletIndices;
-}
 
 void BulletPool::init(size_t count, const Shader &shader)
 {
@@ -13,7 +11,7 @@ void BulletPool::init(size_t count, const Shader &shader)
     bullets.clear();
     for (size_t i = 0; i < count; ++i)
     {
-        auto bulletModel = std::make_shared<Model>(bulletVertices, bulletVertexCount, bulletIndices, bulletIndexCount);
+        auto bulletModel = std::make_shared<Model>(bulletVertices, bulletIndices);
         bulletModel->setShader(std::make_shared<Shader>(shader));
         auto b = std::make_shared<Bullet>(bulletModel);
         b->setLocalAABB(localAABB);
@@ -36,16 +34,32 @@ Bullet *BulletPool::spawn(const glm::vec3 &pos, const std::shared_ptr<EnemyAbstr
     return nullptr;
 }
 
-AABB BulletPool::initRectangleMesh()
-    {
-        generateRectangleMesh(bulletVertices, bulletIndices, bulletVertexCount, bulletIndexCount, 0.07f, 0.07f, glm::vec3(0.0f));
-        glm::vec3 min = bulletVertices[0].position;
-        glm::vec3 max = bulletVertices[0].position;
-        for (unsigned int i = 1; i < bulletVertexCount; ++i)
-        {
-            min = glm::min(min, bulletVertices[i].position);
-            max = glm::max(max, bulletVertices[i].position);
-        }
+void BulletPool::clear()
+{
+    bullets.clear();
+    bulletVertices.reset();
+    bulletIndices.reset();
+}
 
-        return AABB(min, max);
+AABB BulletPool::initRectangleMesh()
+{
+    generateRectangleMesh(bulletVertices, bulletIndices, 0.07f, 0.07f, glm::vec3(0.0f));
+
+    if (!bulletVertices || bulletVertices->empty())
+    {
+        std::cerr << "[BulletPool::initRectangleMesh] bulletVertices is empty!\n";
+        return AABB();
     }
+
+    glm::vec3 min = bulletVertices->at(0).position;
+    glm::vec3 max = min;
+
+    for (size_t i = 1; i < bulletVertices->size(); ++i)
+    {
+        const glm::vec3 &pos = bulletVertices->at(i).position;
+        min = glm::min(min, pos);
+        max = glm::max(max, pos);
+    }
+
+    return AABB(min, max);
+}

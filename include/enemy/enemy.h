@@ -41,7 +41,7 @@ public:
     // movement methods
     virtual void updateModelRotation(float deltaTime) = 0;
     virtual void move(float deltaTime) = 0;
-    virtual void changeWord() = 0;
+    virtual void changeWord(const std::vector<std::string>& wordList) = 0;
     virtual void draw() = 0;
     virtual void drawText() = 0;
 };
@@ -100,7 +100,7 @@ public:
     // Movement methods
     void updateModelRotation(float deltaTime) override;
     void move(float deltaTime) override;
-    void changeWord() override;
+    //void changeWord(const std::vector<std::string>& wordList) override;
     void draw() override;
     void drawText() override;
 

@@ -3,13 +3,14 @@
 #include <cstdlib>
 #include <ctime>
 
-#include "global.h"
 #include "camera.h"
 #include "model.h"
-#include "enemy.h"
-#include "enemy_state.h"
-#include "global_state.h"
-#include "player.h"
+#include "enemy/enemy.h"
+#include "enemy/enemy_state.h"
+#include "global/global.h"
+#include "global/global_state.h"
+#include "bullet/bullet_state.h"
+#include "player/player.h"
 
 #include "utilities/init.h"
 #include "utilities/genMesh.h"
@@ -48,7 +49,7 @@ int main()
     Shader bulletShader("basic.vert", "basic.frag");
     Global::getInstance().bulletPool.init(20, bulletShader);
 
-    double lastTime = glfwGetTime();
+    float lastTime = glfwGetTime();
     float lastFrame = glfwGetTime();
     int frames = 0;
 

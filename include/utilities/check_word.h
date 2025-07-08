@@ -1,7 +1,7 @@
 #pragma once
 
-#include "global.h"
-#include "enemy_state.h"
+#include "global/global.h"
+#include "enemy/enemy_state.h"
 #include "spawn_enemy.h"
 
 void checkWord()
@@ -25,6 +25,5 @@ void checkWord()
         }
     }
 
-    // Clear typed word sau khi bắn
     global.player.currentTypedWord.clear();
 }

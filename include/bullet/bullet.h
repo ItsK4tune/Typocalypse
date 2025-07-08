@@ -5,7 +5,7 @@
 #include <glm/glm.hpp>
 #include "bullet_state_machine.h"
 #include "model.h"
-#include "enemy.h"
+#include "enemy/enemy.h"
 
 #include "utilities/AABB.h"
 

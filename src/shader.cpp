@@ -26,7 +26,7 @@ Shader::~Shader()
 
 std::string Shader::loadShaderSource(const std::string &filepath) const
 {
-    std::string fullPath = std::string("../resources/shaders/") + filepath;
+    std::string fullPath = std::string("../../resources/shaders/") + filepath;
 
     std::ifstream file(fullPath);
     if (!file.is_open())

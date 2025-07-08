@@ -1,30 +1,4 @@
 #pragma once
 
-#include "state.h"
-#include "player.h"
-
-class PlayerIdleState : public State<Player>
-{
-public:
-    static PlayerIdleState &getInstance();
-
-    void enter(Player *enemy) override;
-    void update(Player *enemy, float deltaTime) override;
-    void exit(Player *enemy) override;
-
-private:
-    PlayerIdleState();
-};
-
-class PlayerDieState : public State<Player>
-{
-public:
-    static PlayerDieState &getInstance();
-
-    void enter(Player *enemy) override;
-    void update(Player *enemy, float deltaTime) override;
-    void exit(Player *enemy) override;
-
-private:
-    PlayerDieState();
-};
+#include "player/player_state/idle_state.h"
+#include "player/player_state/die_state.h"

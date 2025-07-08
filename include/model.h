@@ -1,8 +1,10 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 #include <glad/glad.h>
 #include <glm/gtc/matrix_transform.hpp>
+
 #include "vertex.h"
 #include "shader.h"
 
@@ -10,7 +12,7 @@ class Model
 {
 public:
     Model();
-    Model(Vertex *vertices, unsigned int vertexCount, GLuint *indices, unsigned int indexCount);
+    Model(std::shared_ptr<std::vector<Vertex>> vertices, unsigned int vertexCount, std::shared_ptr<std::vector<GLuint>> indices, unsigned int indexCount);
     Model(const char *path);
     ~Model();
 
@@ -25,7 +27,7 @@ public:
     void setScale(const glm::vec3 &scl) { scale = scl; }
 
     void loadModel(const char *path);
-    void loadVertexData(Vertex *vertices, unsigned int vertexCount, GLuint *indices, unsigned int indexCount);
+    void loadVertexData(std::shared_ptr<std::vector<Vertex>> vertices, unsigned int vertexCount, std::shared_ptr<std::vector<GLuint>> indices, unsigned int indexCount);
     void initialize();
     void cleanup();
     void draw();
@@ -33,8 +35,8 @@ public:
 
 private:
     unsigned int VAO, VBO, EBO;
-    Vertex *vertices;
-    GLuint *indices;
+    std::shared_ptr<std::vector<Vertex>> vertices;
+    std::shared_ptr<std::vector<GLuint>> indices;
     unsigned int vertexCount;
     unsigned int indexCount;
     std::shared_ptr<Shader> shader;

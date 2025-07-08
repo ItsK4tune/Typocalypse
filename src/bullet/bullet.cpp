@@ -1,4 +1,4 @@
-#include "bullet.h"
+#include "bullet/bullet.h"
 
 Bullet::Bullet(std::shared_ptr<Model> m)
     : stateMachine(this), model(m), direction(glm::vec3(0.0f, 0.0f, 0.0f))

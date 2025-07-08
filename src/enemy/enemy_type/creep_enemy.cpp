@@ -1,5 +1,5 @@
-#include "enemy.h"
-#include "global.h"
+#include "enemy/enemy.h"
+#include "global/global.h"
 
 CreepEnemy::CreepEnemy(std::shared_ptr<Model> m)
     : stateMachine(this), model(m), direction(glm::vec3(0.0f, 0.0f, 0.0f))

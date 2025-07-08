@@ -4,12 +4,12 @@
 #include <sstream>
 
 Model::Model()
-    : vertices(nullptr), indices(nullptr), vertexCount(0), indexCount(0), shader(nullptr),
+    : vertices(std::make_shared<std::vector<Vertex>>()), indices(std::make_shared<std::vector<GLuint>>()), vertexCount(0), indexCount(0), shader(nullptr),
       VAO(0), VBO(0), EBO(0)
 {
 }
 
-Model::Model(Vertex *vertices, unsigned int vertexCount, GLuint *indices, unsigned int indexCount)
+Model::Model(std::shared_ptr<std::vector<Vertex>> vertices, unsigned int vertexCount, std::shared_ptr<std::vector<GLuint>> indices, unsigned int indexCount)
     : vertices(vertices), vertexCount(vertexCount), indices(indices), indexCount(indexCount), shader(nullptr),
       VAO(0), VBO(0), EBO(0)
 {
@@ -34,7 +34,7 @@ void Model::loadModel(const char *path)
     std::cerr << "[Model::loadModel] not implement yet.\n";
 }
 
-void Model::loadVertexData(Vertex *vertices, unsigned int vertexCount, GLuint *indices, unsigned int indexCount)
+void Model::loadVertexData(std::shared_ptr<std::vector<Vertex>> vertices, unsigned int vertexCount, std::shared_ptr<std::vector<GLuint>> indices, unsigned int indexCount)
 {
     this->vertices = vertices;
     this->vertexCount = vertexCount;
@@ -58,10 +58,10 @@ void Model::initialize()
     glBindVertexArray(VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(Vertex), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(Vertex), vertices->data(), GL_STATIC_DRAW);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount * sizeof(GLuint), indices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount * sizeof(GLuint), indices->data(), GL_STATIC_DRAW);
 
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)0);

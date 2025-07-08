@@ -1,7 +1,7 @@
 #include "utilities/init.h"
 #include "utilities/check_word.h"
 #include <iostream>
-#include <global.h>
+#include "global/global.h"
 
 GLFWwindow *createWindow(int width, int height, const char *title)
 {

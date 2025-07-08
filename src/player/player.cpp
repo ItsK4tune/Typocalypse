@@ -1,4 +1,4 @@
-#include "player.h"
+#include "player/player.h"
 
 Player::Player(std::shared_ptr<Model> m)
     : model(m), stateMachine(this)

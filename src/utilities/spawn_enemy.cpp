@@ -4,9 +4,9 @@
 #include "vertex.h"
 #include "shader.h"
 #include "model.h"
-#include "enemy.h"
-#include "global.h"
-#include "enemy_state.h"
+#include "enemy/enemy.h"
+#include "enemy/enemy_state.h"
+#include "global/global.h"
 
 #include <random>
 #include <algorithm>

@@ -27,7 +27,7 @@ void Bullet::draw()
     model->draw();
 }
 
-void Bullet::move()
+void Bullet::move(float deltaTime)
 {
     if (!target || !model)
         return;
@@ -35,7 +35,7 @@ void Bullet::move()
     glm::vec3 toTarget = target->getModel()->getPosition() - model->getPosition();
     direction = glm::normalize(toTarget);
 
-    acceleration = direction * accelerationRate;
+    acceleration = direction * accelerationRate * deltaTime;
 
     velocity += acceleration;
 

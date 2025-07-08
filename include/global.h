@@ -11,6 +11,8 @@
 #include "bullet_state.h"
 
 #include "utilities/text_renderer.h"
+#include "utilities/genMesh.h"
+#include "utilities/AABB.h"
 
 class GameAttribute
 {
@@ -62,12 +64,16 @@ class BulletPool
 public:
     std::vector<std::shared_ptr<Bullet>> bullets;
 
-    void init(size_t count, std::shared_ptr<Model> model)
+    void init(size_t count, Shader shader)
     {
+        AABB localAABB = initRectangleMesh();
         bullets.clear();
         for (size_t i = 0; i < count; ++i)
         {
-            auto b = std::make_shared<Bullet>(model);
+            auto bulletModel = std::make_shared<Model>(bulletVertices, bulletVertexCount, bulletIndices, bulletIndexCount);
+            bulletModel->setShader(std::make_shared<Shader>(shader));
+            auto b = std::make_shared<Bullet>(bulletModel);
+            b->setLocalAABB(localAABB);
             bullets.push_back(b);
         }
     }
@@ -87,13 +93,24 @@ public:
         return nullptr;
     }
 
-    void updateAll(float dt)
+private:
+    Vertex *bulletVertices = nullptr;
+    GLuint *bulletIndices = nullptr;
+    unsigned int bulletVertexCount = 0;
+    unsigned int bulletIndexCount = 0;
+
+    AABB initRectangleMesh()
     {
-        for (auto &b : bullets)
+        generateRectangleMesh(bulletVertices, bulletIndices, bulletVertexCount, bulletIndexCount, 0.1f, 0.1f, glm::vec3(0.0f));
+        glm::vec3 min = bulletVertices[0].position;
+        glm::vec3 max = bulletVertices[0].position;
+        for (unsigned int i = 1; i < bulletVertexCount; ++i)
         {
-            if (b->getStateMachine().getCurrentState() != &BulletDieState::getInstance())
-                b->update(dt);
+            min = glm::min(min, bulletVertices[i].position);
+            max = glm::max(max, bulletVertices[i].position);
         }
+
+        return AABB(min, max);
     }
 };
 
@@ -127,7 +144,6 @@ public:
     void update(float dt)
     {
         stateMachine.update(dt);
-        bulletPool.updateAll(dt);
     }
     void changeState(State<Global> *newState) { stateMachine.changeState(newState); }
     void initText()

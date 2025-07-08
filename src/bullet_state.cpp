@@ -13,7 +13,7 @@ void BulletFlyingState::enter(Bullet *bullet)
 }
 void BulletFlyingState::update(Bullet *bullet, float deltaTime)
 {
-    bullet->move();
+    bullet->move(deltaTime);
     bullet->draw();
 }
 void BulletFlyingState::exit(Bullet *bullet)

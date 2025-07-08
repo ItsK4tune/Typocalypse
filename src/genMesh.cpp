@@ -35,7 +35,7 @@ void generateCircleMesh(Vertex *&outVertices, GLuint *&outIndices, unsigned int 
     }
 }
 
-void generateRectangleMesh(Vertex *&vertices, GLuint *&indices, unsigned int &vertexCount, unsigned int &indexCount, float width, float height)
+void generateRectangleMesh(Vertex *&vertices, GLuint *&indices, unsigned int &vertexCount, unsigned int &indexCount, float width, float height, glm::vec3 color)
 {
     vertexCount = 4;
     indexCount = 6;
@@ -50,6 +50,11 @@ void generateRectangleMesh(Vertex *&vertices, GLuint *&indices, unsigned int &ve
     vertices[1] = {{w, -h, 0.0f}, {0, 1, 0}, {0, 0, 1}, {1, 0}};
     vertices[2] = {{w, h, 0.0f}, {0, 0, 1}, {0, 0, 1}, {1, 1}};
     vertices[3] = {{-w, h, 0.0f}, {1, 1, 0}, {0, 0, 1}, {0, 1}};
+
+    for (unsigned int i = 0; i < vertexCount; ++i)
+    {
+        vertices[i].color = color;
+    }
 }
 
 void generatetriangleMesh(Vertex *&vertices, GLuint *&indices, unsigned int &vertexCount, unsigned int &indexCount, float headLength, float tailLength, glm::vec3 color)

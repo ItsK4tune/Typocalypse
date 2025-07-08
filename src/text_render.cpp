@@ -37,7 +37,7 @@ void TextRenderer::load(const std::string &fontPath, unsigned int fontSize)
     }
 
     FT_Face face;
-    std::string fullPath = std::string("resources/fonts/") + fontPath;
+    std::string fullPath = std::string("../resources/fonts/") + fontPath;
     if (FT_New_Face(ft, fullPath.c_str(), 0, &face))
     {
         std::cerr << "Failed to load font\n";

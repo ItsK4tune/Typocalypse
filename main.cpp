@@ -45,13 +45,8 @@ int main()
     initEnemyPool(wordList, shader);
 
     // bullet
-    Vertex *bulletVertices = nullptr;
-    GLuint *bulletIndices = nullptr;
-    unsigned int bulletVertexCount = 0;
-    unsigned int bulletIndexCount = 0;
-    generateRectangleMesh(bulletVertices, bulletIndices, bulletVertexCount, bulletIndexCount, 0.1f, 0.1f);
-    auto bulletModel = std::make_shared<Model>(bulletVertices, bulletVertexCount, bulletIndices, bulletIndexCount);
-    Global::getInstance().bulletPool.init(20, bulletModel);
+    Shader bulletShader("basic.vert", "basic.frag");
+    Global::getInstance().bulletPool.init(20, bulletShader);
 
     double lastTime = glfwGetTime();
     float lastFrame = glfwGetTime();
@@ -100,6 +95,23 @@ int main()
         player->getModel()->getShader()->use();
         player->getModel()->getShader()->setMat4("mvp", glm::value_ptr(mvp));
         player->update(deltaTime);
+
+        for (auto &b : Global::getInstance().bulletPool.bullets)
+        {
+            if (b->getStateMachine().getCurrentState() == &BulletFlyingState::getInstance())
+            {
+                b->getModel()->getShader()->use();
+                b->getModel()->getShader()->setMat4("mvp", glm::value_ptr(projection * view * b->getModel()->getModelMatrix()));
+
+                if (b->getWorldAABB().intersects(b->getTarget()->getWorldAABB()))
+                {
+                    b->getTarget()->getStateMachine().changeState(&EnemyDieState::getInstance());
+                    b->getStateMachine().changeState(&BulletDieState::getInstance());
+                }
+            }
+
+            b->update(deltaTime);
+        }
 
         for (auto &e : Global::getInstance().enemy.enemies)
         {

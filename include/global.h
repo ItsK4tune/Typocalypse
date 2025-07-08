@@ -64,7 +64,7 @@ class BulletPool
 public:
     std::vector<std::shared_ptr<Bullet>> bullets;
 
-    void init(size_t count, Shader shader)
+    void init(size_t count, const Shader &shader)
     {
         AABB localAABB = initRectangleMesh();
         bullets.clear();
@@ -101,7 +101,7 @@ private:
 
     AABB initRectangleMesh()
     {
-        generateRectangleMesh(bulletVertices, bulletIndices, bulletVertexCount, bulletIndexCount, 0.1f, 0.1f, glm::vec3(0.0f));
+        generateRectangleMesh(bulletVertices, bulletIndices, bulletVertexCount, bulletIndexCount, 0.07f, 0.07f, glm::vec3(0.0f));
         glm::vec3 min = bulletVertices[0].position;
         glm::vec3 max = bulletVertices[0].position;
         for (unsigned int i = 1; i < bulletVertexCount; ++i)

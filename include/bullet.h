@@ -60,8 +60,8 @@ private:
     glm::vec3 direction;
     glm::vec3 velocity = glm::vec3(0.0f);
     glm::vec3 acceleration = glm::vec3(0.0f);
-    float maxSpeed = 0.001f;
-    float accelerationRate = 0.0001f;
+    float maxSpeed = 0.1f;
+    float accelerationRate = 0.1f;
     AABB localAABB;
 
     BulletStateMachine stateMachine;

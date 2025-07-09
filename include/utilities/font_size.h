@@ -11,5 +11,6 @@ inline int toInt(FontSize size) {
         case FontSize::Title:  return 144;
         case FontSize::Menu:   return 96;
         case FontSize::Normal: return 48;
+        default: 24;
     }
 }

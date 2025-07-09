@@ -78,18 +78,6 @@ void GlobalPlayState::update(Global *global, float deltaTime)
         e->getModel()->getShader()->setMat4("mvp", glm::value_ptr(projection * view * e->getModel()->getModelMatrix()));
         e->update(deltaTime);
     }
-
-    std::string typed = global->playerData.currentTypedWord;
-    float scale = 1.0f, width = 0.0f;
-    const auto &chars = global->fontMap[FontSize::Normal]->getCharacters();
-    for (char c : typed)
-    {
-        if (chars.count(c))
-            width += (chars.at(c).advance >> 6) * scale;
-    }
-    float x = (global->screenWidth - width) / 2.0f;
-    float y = 50.0f;
-    global->fontMap[FontSize::Normal]->renderText(typed, x, y, scale, glm::vec3(0.2f, 0.2f, 0.2f));
 }
 void GlobalPlayState::exit(Global *global)
 {

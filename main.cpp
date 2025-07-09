@@ -12,6 +12,7 @@
 #include "global/global_state.h"
 #include "bullet/bullet_state.h"
 #include "player/player.h"
+#include "resource_manager/resource_manager.h"
 
 #include "utilities/init.h"
 #include "utilities/genMesh.h"
@@ -21,7 +22,9 @@
 int main()
 {
     srand(static_cast<unsigned int>(time(nullptr)));
+
     Global::getInstance().window = createWindow(Global::getInstance().screenWidth, Global::getInstance().screenHeight, "Typocalypse");
+    ResourceManager::getInstance().loadFromFile("resource.rm");
     Global::getInstance().initText();
 
     // enemy

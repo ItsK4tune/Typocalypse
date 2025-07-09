@@ -4,7 +4,8 @@
 
 struct ChargeStats : public EnemyStats
 {
-    ChargeStats() {
+    ChargeStats()
+    {
         numberOfUnique = 1;
     }
 
@@ -15,8 +16,8 @@ struct ChargeStats : public EnemyStats
     {
         EnemyStats::reset();
         numberOfUnique = 1;
-        chargeTime = 5.0f;
-        triggerTime = 1.0f;
+        chargeTime = 3.0f;
+        triggerTime = 2.0f;
     }
 };
 

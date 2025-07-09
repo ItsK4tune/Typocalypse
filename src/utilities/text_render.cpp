@@ -13,9 +13,13 @@ TextRenderer::TextRenderer(int w, int h)
     glGenBuffers(1, &VBO);
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 4, nullptr, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 5, nullptr, GL_DYNAMIC_DRAW);
+    // Attribute 0: position (vec3)
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)0);
+    // Attribute 1: texCoord (vec2)
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)(3 * sizeof(float)));
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 }
@@ -91,15 +95,16 @@ void TextRenderer::renderText(const std::string &text, float x, float y, float s
         float ypos = y - (ch.size.y - ch.bearing.y) * scale;
         float w = ch.size.x * scale;
         float h = ch.size.y * scale;
+        float z = -0.1f;
 
-        float vertices[6][4] = {
-            {xpos, ypos + h, 0.0f, 0.0f},
-            {xpos, ypos, 0.0f, 1.0f},
-            {xpos + w, ypos, 1.0f, 1.0f},
+        float vertices[6][5] = {
+            {xpos, ypos + h, z, 0.0f, 0.0f},
+            {xpos, ypos, z, 0.0f, 1.0f},
+            {xpos + w, ypos, z, 1.0f, 1.0f},
 
-            {xpos, ypos + h, 0.0f, 0.0f},
-            {xpos + w, ypos, 1.0f, 1.0f},
-            {xpos + w, ypos + h, 1.0f, 0.0f}};
+            {xpos, ypos + h, z, 0.0f, 0.0f},
+            {xpos + w, ypos, z, 1.0f, 1.0f},
+            {xpos + w, ypos + h, z, 1.0f, 0.0f}};
 
         glBindTexture(GL_TEXTURE_2D, ch.textureID);
         glBindBuffer(GL_ARRAY_BUFFER, VBO);

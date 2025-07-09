@@ -1,0 +1,12 @@
+#model 1
+id enemy
+model "enemy.model"
+
+#shader 2
+id default
+vs "basic.vert"
+fs "basic.frag"
+
+id text
+vs "text.vert"
+fs "text.frag"

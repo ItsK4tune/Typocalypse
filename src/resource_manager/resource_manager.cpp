@@ -5,25 +5,33 @@
 #include <iostream>
 #include <iomanip>
 
-ResourceManager& ResourceManager::getInstance() {
+ResourceManager &ResourceManager::getInstance()
+{
     static ResourceManager instance;
     return instance;
 }
 
-void ResourceManager::loadFromFile(const std::string& filePath) {
-    std::ifstream file(filePath);
-    if (!file) {
-        std::cerr << "[ResourceManager] Failed to open: " << filePath << "\n";
+void ResourceManager::loadFromFile(const std::string &filePath)
+{
+    std::string fullPath = "../../resources/" + filePath;
+
+    std::ifstream file(fullPath);
+    if (!file)
+    {
+        std::cerr << "[ResourceManager] Failed to open: " << fullPath << "\n";
         return;
     }
 
     std::string line;
-    while (std::getline(file, line)) {
-        if (line.starts_with("#model")) {
+    while (std::getline(file, line))
+    {
+        if (line.starts_with("#model"))
+        {
             int modelCount;
             std::istringstream(line.substr(6)) >> modelCount;
 
-            for (int i = 0; i < modelCount; ++i) {
+            for (int i = 0; i < modelCount; ++i)
+            {
                 std::string idLine, modelLine;
                 std::getline(file, idLine);
                 std::getline(file, modelLine);
@@ -38,11 +46,14 @@ void ResourceManager::loadFromFile(const std::string& filePath) {
 
                 models[id] = loadModelFromPath(path);
             }
-        } else if (line.starts_with("#shader")) {
+        }
+        else if (line.starts_with("#shader"))
+        {
             int shaderCount;
             std::istringstream(line.substr(7)) >> shaderCount;
 
-            for (int i = 0; i < shaderCount; ++i) {
+            for (int i = 0; i < shaderCount; ++i)
+            {
                 std::string idLine, vsLine, fsLine, gsLine;
 
                 std::getline(file, idLine);
@@ -69,7 +80,8 @@ void ResourceManager::loadFromFile(const std::string& filePath) {
                     ss >> ignore >> std::quoted(fsPath);
                 }
 
-                if (!gsLine.empty() && gsLine.starts_with("gs")) {
+                if (!gsLine.empty() && gsLine.starts_with("gs"))
+                {
                     std::istringstream ss(gsLine);
                     std::string ignore;
                     ss >> ignore >> std::quoted(gsPath);
@@ -81,28 +93,33 @@ void ResourceManager::loadFromFile(const std::string& filePath) {
     }
 }
 
-std::shared_ptr<Shader> ResourceManager::loadShader(const std::string& vsPath, const std::string& fsPath, const std::string& gsPath) {
+std::shared_ptr<Shader> ResourceManager::loadShader(const std::string &vsPath, const std::string &fsPath, const std::string &gsPath)
+{
     if (gsPath.empty())
-        return std::make_shared<Shader>(vsPath.c_str(), fsPath.c_str());
+        return std::make_shared<Shader>(vsPath, fsPath);
     else
-        return std::make_shared<Shader>(vsPath.c_str(), fsPath.c_str(), gsPath.c_str());
+        return std::make_shared<Shader>(vsPath, fsPath, gsPath);
 }
 
-std::shared_ptr<Model> ResourceManager::loadModelFromPath(const std::string& path) {
-    return std::make_shared<Model>(path.c_str());
+std::shared_ptr<Model> ResourceManager::loadModelFromPath(const std::string &path)
+{
+    return std::make_shared<Model>(path);
 }
 
-std::shared_ptr<Shader> ResourceManager::getShader(const std::string& id) const {
+std::shared_ptr<Shader> ResourceManager::getShader(const std::string &id) const
+{
     auto it = shaders.find(id);
     return (it != shaders.end()) ? it->second : nullptr;
 }
 
-std::shared_ptr<Model> ResourceManager::getModel(const std::string& id) const {
+std::shared_ptr<Model> ResourceManager::getModel(const std::string &id) const
+{
     auto it = models.find(id);
     return (it != models.end()) ? it->second : nullptr;
 }
 
-void ResourceManager::clear() {
+void ResourceManager::clear()
+{
     shaders.clear();
     models.clear();
 }

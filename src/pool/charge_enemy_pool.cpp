@@ -6,19 +6,23 @@
 
 #include "enemy/enemy_state.h"
 #include "utilities/genMesh.h"
+#include "resource_manager/resource_manager.h"
 
-void ChargeEnemyPool::init(size_t count, const Shader &shader, const std::vector<std::string> &wordList) {
+void ChargeEnemyPool::init(size_t count, const Shader &shader, const std::vector<std::string> &wordList)
+{
     AABB localAABB = initTriangleMesh();
     enemies.clear();
 
     std::vector<std::string> fullWordList;
 
-    if (wordList.empty()) {
+    if (wordList.empty())
+    {
         std::cerr << "[ChargeEnemyPool::init] wordList is empty!\n";
         return;
     }
 
-    while (fullWordList.size() < count) {
+    while (fullWordList.size() < count)
+    {
         fullWordList.insert(fullWordList.end(), wordList.begin(), wordList.end());
     }
 
@@ -28,11 +32,12 @@ void ChargeEnemyPool::init(size_t count, const Shader &shader, const std::vector
     std::default_random_engine rng(rd());
     std::shuffle(fullWordList.begin(), fullWordList.end(), rng);
 
-    for (size_t i = 0; i < count; ++i) {
-        auto enemyModel = std::make_shared<Model>(enemyVertices, enemyIndices);
-        enemyModel->setShader(std::make_shared<Shader>(shader));
+    for (size_t i = 0; i < count; ++i)
+    {
+        auto enemyModel = std::make_shared<Model>(*ResourceManager::getInstance().getModel("enemy"));
+        enemyModel->setShader(ResourceManager::getInstance().getShader("default"));
         auto e = std::make_shared<ChargeEnemy>(enemyModel);
-        e->setLocalAABB(localAABB);
+        e->setLocalAABB(enemyModel->getAABB());
         e->setWord(fullWordList[i]);
         enemies.push_back(e);
     }
@@ -45,7 +50,7 @@ void ChargeEnemyPool::clear()
     enemyIndices.reset();
 }
 
-ChargeEnemy* ChargeEnemyPool::spawn()
+ChargeEnemy *ChargeEnemyPool::spawn()
 {
     std::vector<int> deadIndices;
 
@@ -67,7 +72,8 @@ ChargeEnemy* ChargeEnemyPool::spawn()
     return enemy.get();
 }
 
-void ChargeEnemyPool::add(std::shared_ptr<ChargeEnemy> e){
+void ChargeEnemyPool::add(std::shared_ptr<ChargeEnemy> e)
+{
     enemies.push_back(e);
 }
 

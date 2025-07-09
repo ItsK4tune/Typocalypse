@@ -2,55 +2,64 @@
 #include <iostream>
 #include <algorithm>
 
-Menu::Menu()
-    : stateMachine(this), textRenderer(nullptr) {}
-Menu::Menu(std::shared_ptr<TextRenderer> renderer)
-    : stateMachine(this), textRenderer(renderer) {}
+Menu::Menu() : stateMachine(this), textRenderer(nullptr) {}
+Menu::Menu(std::shared_ptr<TextRenderer> renderer) : stateMachine(this), textRenderer(renderer) {}
 
-void Menu::addItem(const std::string &text,
-                   const glm::vec2 &pos,
-                   float scale,
-                   const glm::vec3 &color)
+void Menu::addTextItem(const std::string &text,
+                       const glm::vec2 &pos,
+                       float scale,
+                       const glm::vec3 &color)
 {
-    items.emplace_back(text, pos, scale, color);
+    textItems.emplace_back(text, pos, scale, color);
 }
 
-void Menu::setItem(size_t index,
-                   const glm::vec2 &pos,
-                   float scale,
-                   const glm::vec3 &color)
+void Menu::setTextItem(size_t index,
+                       const glm::vec2 &pos,
+                       float scale,
+                       const glm::vec3 &color)
 {
-    if (index >= items.size())
+    if (index >= textItems.size())
     {
         std::cerr << "[Menu] Invalid item index: " << index << "\n";
         return;
     }
 
-    items[index].position = pos;
-    items[index].baseScale = scale;
-    items[index].baseColor = color;
+    textItems[index].position = pos;
+    textItems[index].baseScale = scale;
+    textItems[index].baseColor = color;
 }
 
-void Menu::setTextRenderer(std::shared_ptr<TextRenderer> text) {
-    textRenderer = text;
-}
-
-void Menu::clear()
+void Menu::clearTexts()
 {
-    items.clear();
+    textItems.clear();
     selectedIndex = 0;
+}
+
+void Menu::addModel(std::shared_ptr<Model> model)
+{
+    uiModels.push_back(model);
+}
+
+void Menu::clearModels()
+{
+    uiModels.clear();
+}
+
+void Menu::setTextRenderer(std::shared_ptr<TextRenderer> text)
+{
+    textRenderer = text;
 }
 
 void Menu::moveUp()
 {
-    if (!items.empty())
-        selectedIndex = (selectedIndex - 1 + items.size()) % items.size();
+    if (!textItems.empty())
+        selectedIndex = (selectedIndex - 1 + textItems.size()) % textItems.size();
 }
 
 void Menu::moveDown()
 {
-    if (!items.empty())
-        selectedIndex = (selectedIndex + 1) % items.size();
+    if (!textItems.empty())
+        selectedIndex = (selectedIndex + 1) % textItems.size();
 }
 
 int Menu::getSelectedIndex() const
@@ -60,9 +69,15 @@ int Menu::getSelectedIndex() const
 
 void Menu::render()
 {
-    for (size_t i = 0; i < items.size(); ++i)
+    for (auto &model : uiModels)
     {
-        const MenuItem &item = items[i];
+        model->getShader()->use();
+        model->draw();
+    }
+
+    for (size_t i = 0; i < textItems.size(); ++i)
+    {
+        const MenuItem &item = textItems[i];
         float scale = item.baseScale;
         glm::vec3 color = item.baseColor;
 

@@ -16,11 +16,28 @@ Model::Model(std::shared_ptr<std::vector<Vertex>> vertices, std::shared_ptr<std:
     initialize();
 }
 
-Model::Model(const char *path)
+Model::Model(const std::string &filePath)
     : vertices(nullptr), indices(nullptr), shader(nullptr),
       VAO(0), VBO(0), EBO(0)
 {
-    loadModel(path);
+    loadModel(filePath);
+    initialize();
+}
+
+Model::Model(const Model &other)
+{
+    if (other.vertices)
+        vertices = std::make_shared<std::vector<Vertex>>(*other.vertices);
+    if (other.indices)
+        indices = std::make_shared<std::vector<GLuint>>(*other.indices);
+
+    shader = other.shader;
+
+    position = other.position;
+    rotation = other.rotation;
+    scale = other.scale;
+
+    VAO = VBO = EBO = 0;
     initialize();
 }
 
@@ -29,12 +46,14 @@ Model::~Model()
     cleanup();
 }
 
-void Model::loadModel(const char *path)
+void Model::loadModel(const std::string &filePath)
 {
-    std::ifstream file(path);
+    std::string fullPath = "../../resources/models/" + filePath;
+
+    std::ifstream file(fullPath);
     if (!file)
     {
-        std::cerr << "[Model::loadModel] Failed to open file: " << path << "\n";
+        std::cerr << "[Model::loadModel] Failed to open file: " << fullPath << "\n";
         return;
     }
 
@@ -89,7 +108,7 @@ void Model::loadModel(const char *path)
     }
 
     std::cout << "[Model::loadModel] Loaded " << vertices->size() << " vertices and "
-              << indices->size() << " indices from " << path << "\n";
+              << indices->size() << " indices from " << fullPath << "\n";
 }
 
 void Model::loadVertexData(std::shared_ptr<std::vector<Vertex>> vertices, std::shared_ptr<std::vector<GLuint>> indices)
@@ -179,4 +198,27 @@ glm::mat4 Model::getModelMatrix() const
     model = glm::rotate(model, rotation.z, glm::vec3(0, 0, 1));
     model = glm::scale(model, scale);
     return model;
+}
+
+AABB Model::getAABB() const
+{
+    if (!vertices || vertices->empty())
+    {
+        return AABB();
+    }
+
+    glm::mat4 modelMatrix = getModelMatrix();
+    glm::vec3 minPoint(FLT_MAX);
+    glm::vec3 maxPoint(-FLT_MAX);
+
+    for (const auto &v : *vertices)
+    {
+        glm::vec4 worldPos = modelMatrix * glm::vec4(v.position, 1.0f);
+        glm::vec3 pos3 = glm::vec3(worldPos);
+
+        minPoint = glm::min(minPoint, pos3);
+        maxPoint = glm::max(maxPoint, pos3);
+    }
+
+    return AABB(minPoint, maxPoint);
 }

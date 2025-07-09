@@ -8,8 +8,8 @@ EnemyFreezeState &EnemyFreezeState::getInstance()
 }
 void EnemyFreezeState::enter(EnemyAbstract *enemy)
 {
-    enemy->setVelocity(glm::vec3(0.0f));
-    enemy->setAcceleration(glm::vec3(0.0f));
+    enemy->getStats()->velocity = glm::vec3(0.0f);
+    enemy->getStats()->acceleration = glm::vec3(0.0f);
 }
 void EnemyFreezeState::update(EnemyAbstract *enemy, float deltaTime)
 {

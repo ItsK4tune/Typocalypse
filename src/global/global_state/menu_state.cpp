@@ -1,4 +1,5 @@
 #include "global/global_state.h"
+#include <utilities/init.h>
 
 GlobalMenuState::GlobalMenuState() {}
 GlobalMenuState &GlobalMenuState::getInstance()
@@ -8,11 +9,11 @@ GlobalMenuState &GlobalMenuState::getInstance()
 }
 void GlobalMenuState::enter(Global *global)
 {
-    printf("Entering GlobalMenuState\n");
 }
 void GlobalMenuState::update(Global *global, float deltaTime)
 {
-    global->drawText();
+    global->menu->update(deltaTime);
+    // global->drawText();
 
     if (global->game.isMousePressed &&
         global->game.mouseX >= 0 &&
@@ -20,7 +21,6 @@ void GlobalMenuState::update(Global *global, float deltaTime)
         global->game.mouseY >= 0 &&
         global->game.mouseY <= global->screenHeight)
     {
-        printf("Mouse pressed, changing to play state\n");
         global->changeState(&GlobalPlayState::getInstance());
     }
 }

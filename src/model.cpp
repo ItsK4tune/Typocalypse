@@ -31,7 +31,65 @@ Model::~Model()
 
 void Model::loadModel(const char *path)
 {
-    std::cerr << "[Model::loadModel] not implement yet.\n";
+    std::ifstream file(path);
+    if (!file)
+    {
+        std::cerr << "[Model::loadModel] Failed to open file: " << path << "\n";
+        return;
+    }
+
+    std::string line;
+    size_t vertexCount = 0;
+    size_t indexCount = 0;
+
+    vertices = std::make_shared<std::vector<Vertex>>();
+    indices = std::make_shared<std::vector<GLuint>>();
+
+    while (std::getline(file, line))
+    {
+        if (line.starts_with("#vertices"))
+        {
+            std::istringstream iss(line.substr(9));
+            iss >> vertexCount;
+
+            for (size_t i = 0; i < vertexCount; ++i)
+            {
+                float px, py, pz;
+                float r, g, b;
+
+                std::getline(file, line);
+                std::istringstream vss(line);
+                vss >> px >> py >> pz >> r >> g >> b;
+
+                Vertex v;
+                v.position = glm::vec3(px, py, pz);
+                v.color = glm::vec3(r, g, b);
+
+                vertices->push_back(v);
+            }
+        }
+        else if (line.starts_with("#indices"))
+        {
+            std::istringstream iss(line.substr(8));
+            iss >> indexCount;
+
+            for (size_t i = 0; i < indexCount; ++i)
+            {
+                GLuint a, b, c;
+
+                std::getline(file, line);
+                std::istringstream issTri(line);
+                issTri >> a >> b >> c;
+
+                indices->push_back(a);
+                indices->push_back(b);
+                indices->push_back(c);
+            }
+        }
+    }
+
+    std::cout << "[Model::loadModel] Loaded " << vertices->size() << " vertices and "
+              << indices->size() << " indices from " << path << "\n";
 }
 
 void Model::loadVertexData(std::shared_ptr<std::vector<Vertex>> vertices, std::shared_ptr<std::vector<GLuint>> indices)

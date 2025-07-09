@@ -6,16 +6,16 @@
 #include "enemy/enemy.h"
 #include "shader.h"
 
-class CreepEnemyPool
+class ChargeEnemyPool
 {
 public:
-    std::vector<std::shared_ptr<CreepEnemy>> enemies;
-    int maxEnemyCount = 0;
+    std::vector<std::shared_ptr<ChargeEnemy>> enemies;
+    int maxEnemyCount = 1;
     int currentEnemyCount = 0;
 
     void init(size_t count, const Shader &shader, const std::vector<std::string> &wordList);
-    CreepEnemy* spawn();
-    void add(std::shared_ptr<CreepEnemy> e);
+    ChargeEnemy* spawn();
+    void add(std::shared_ptr<ChargeEnemy> e);
     void clear();
     void updateCurrentEnemyCount();
 private:

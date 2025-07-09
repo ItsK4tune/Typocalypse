@@ -2,13 +2,18 @@
 
 #include <string>
 #include <vector>
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 
+#include "menu/menu.h"
 #include "camera.h"
 #include "global/global_state_machine.h"
 #include "pool/creep_enemy_pool.h"
+#include "pool/charge_enemy_pool.h"
 #include "pool/bullet_pool.h"
 #include "utilities/text_renderer.h"
 #include "global/player_data.h"
+#include "utilities/font_size.h"
 
 class GameAttribute
 {
@@ -38,14 +43,21 @@ public:
     Global(const Global &) = delete;
     Global &operator=(const Global &) = delete;
 
+    GLFWwindow *window;
+    std::shared_ptr<Menu> menu;
+
     GameAttribute attribute;
     PlayerData playerData;
     GameManager game;
-    CreepEnemyPool enemy;
-    BulletPool bulletPool;
     std::shared_ptr<Camera> camera;
+
+    std::vector<std::shared_ptr<EnemyAbstract>> enemies;
+    CreepEnemyPool creepEnemyPool;
+    ChargeEnemyPool chargeEnemyPool;
+    BulletPool bulletPool;
+
     GlobalStateMachine stateMachine;
-    std::unique_ptr<TextRenderer> text;
+    std::map<FontSize, std::shared_ptr<TextRenderer>> fontMap;
 
     int screenWidth = 1920;
     int screenHeight = 1080;
@@ -53,7 +65,7 @@ public:
     void update(float dt);
     void changeState(State<Global> *newState);
     void initText();
-    void drawText();
+    void createPool();
 
 private:
     Global();

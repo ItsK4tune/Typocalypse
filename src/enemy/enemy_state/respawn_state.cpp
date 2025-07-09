@@ -9,10 +9,7 @@ EnemyRespawnState &EnemyRespawnState::getInstance()
 }
 void EnemyRespawnState::enter(EnemyAbstract *enemy)
 {
-    enemy->setVelocity(glm::vec3(0.0f));
-    enemy->setAcceleration(glm::vec3(0.0f));
-    enemy->setMaxSpeed(0.5f);
-    enemy->setAccelerationRate(3.0f);
+    enemy->getStats()->reset();
 
     float x = -3.0f + static_cast<float>(rand()) / RAND_MAX * 6.0f;
     float y = sqrt(9.0f - x * x) * (rand() % 2 == 0 ? 1.0f : -1.0f);

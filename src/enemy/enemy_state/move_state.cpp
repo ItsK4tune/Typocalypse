@@ -15,6 +15,9 @@ void EnemyMoveState::update(EnemyAbstract *enemy, float deltaTime)
     enemy->move(deltaTime);
     enemy->draw();
     enemy->drawText();
+
+    if (enemy->getStats()->numberOfUnique)
+        enemy->uniqueTrigger(deltaTime);
 }
 void EnemyMoveState::exit(EnemyAbstract *enemy)
 {

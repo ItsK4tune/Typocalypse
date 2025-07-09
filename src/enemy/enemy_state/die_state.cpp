@@ -8,8 +8,7 @@ EnemyDieState &EnemyDieState::getInstance()
 }
 void EnemyDieState::enter(EnemyAbstract *enemy)
 {
-    enemy->setVelocity(glm::vec3(0.0f));
-    enemy->setAcceleration(glm::vec3(0.0f));
+    enemy->getStats()->reset();
 }
 void EnemyDieState::update(EnemyAbstract *enemy, float deltaTime)
 {

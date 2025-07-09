@@ -21,8 +21,7 @@
 int main()
 {
     srand(static_cast<unsigned int>(time(nullptr)));
-    GLFWwindow *window = createWindow(Global::getInstance().screenWidth, Global::getInstance().screenHeight, "Typocalypse");
-
+    Global::getInstance().window = createWindow(Global::getInstance().screenWidth, Global::getInstance().screenHeight, "Typocalypse");
     Global::getInstance().initText();
 
     // enemy
@@ -33,14 +32,16 @@ int main()
     Shader shader("basic.vert", "basic.frag");
     Global::getInstance().playerData.init(shader);
     Global::getInstance().bulletPool.init(20, shader);
-    Global::getInstance().enemy.init(100, shader, wordList);
+    Global::getInstance().creepEnemyPool.init(100, shader, wordList);
+    Global::getInstance().chargeEnemyPool.init(100, shader, wordList);
+    Global::getInstance().createPool();
 
     float lastTime = glfwGetTime();
     float lastFrame = glfwGetTime();
     int frames = 0;
 
     float totalTime = 0.0f;
-    while (!glfwWindowShouldClose(window))
+    while (!glfwWindowShouldClose(Global::getInstance().window))
     {
         float currentFrame = glfwGetTime();
         float deltaTime = currentFrame - lastFrame;
@@ -52,7 +53,7 @@ int main()
         {
             std::stringstream ss;
             ss << "Typocalypse - FPS: " << frames;
-            glfwSetWindowTitle(window, ss.str().c_str());
+            glfwSetWindowTitle(Global::getInstance().window, ss.str().c_str());
             frames = 0;
             lastTime += 1.0;
         }
@@ -65,23 +66,18 @@ int main()
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-            glfwSetWindowShouldClose(window, true);
+        if (glfwGetKey(Global::getInstance().window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+            glfwSetWindowShouldClose(Global::getInstance().window, true);
 
         Global::getInstance().update(deltaTime);
-        if (Global::getInstance().stateMachine.getCurrentState() == &GlobalMenuState::getInstance())
-        {
-            glfwSwapBuffers(window);
-            glfwPollEvents();
-            continue;
-        }
+        // if (Global::getInstance().stateMachine.getCurrentState() == &GlobalMenuState::getInstance())
 
         if (Global::getInstance().stateMachine.getCurrentState() == &GlobalGameOverState::getInstance())
         {
-            glfwSetWindowShouldClose(window, true);
+            glfwSetWindowShouldClose(Global::getInstance().window, true);
         }
 
-        glfwSwapBuffers(window);
+        glfwSwapBuffers(Global::getInstance().window);
         glfwPollEvents();
     }
 

@@ -1,12 +1,13 @@
 #include "enemy/enemy.h"
 #include "global/global.h"
 #include "utilities/text_match.h"
+#include "enemy/enemy_state.h"
 
-CreepEnemy::CreepEnemy(std::shared_ptr<Model> m)
+ChargeEnemy::ChargeEnemy(std::shared_ptr<Model> m)
     : stateMachine(this), model(m), direction(glm::vec3(0.0f, 0.0f, 0.0f))
 {
 }
-CreepEnemy::~CreepEnemy()
+ChargeEnemy::~ChargeEnemy()
 {
     if (model)
     {
@@ -14,16 +15,16 @@ CreepEnemy::~CreepEnemy()
     }
 }
 
-void CreepEnemy::setDirection(const glm::vec3 &dir) { direction = glm::normalize(dir); }
-void CreepEnemy::setWord(const std::string &w) { word = w; }
-void CreepEnemy::setLocalAABB(const AABB &box) { localAABB = box; }
+void ChargeEnemy::setDirection(const glm::vec3 &dir) { direction = glm::normalize(dir); }
+void ChargeEnemy::setWord(const std::string &w) { word = w; }
+void ChargeEnemy::setLocalAABB(const AABB &box) { localAABB = box; }
 
-std::shared_ptr<Model> CreepEnemy::getModel() const { return model; }
-EnemyStateMachine &CreepEnemy::getStateMachine() { return stateMachine; }
-glm::vec3 CreepEnemy::getDirection() const { return direction; }
-const std::string &CreepEnemy::getWord() const { return word; }
-const AABB &CreepEnemy::getLocalAABB() const { return localAABB; }
-AABB CreepEnemy::getWorldAABB() const
+glm::vec3 ChargeEnemy::getDirection() const { return direction; }
+std::shared_ptr<Model> ChargeEnemy::getModel() const { return model; }
+EnemyStateMachine &ChargeEnemy::getStateMachine() { return stateMachine; }
+const std::string &ChargeEnemy::getWord() const { return word; }
+const AABB &ChargeEnemy::getLocalAABB() const { return localAABB; }
+AABB ChargeEnemy::getWorldAABB() const
 {
     glm::mat4 modelMat = model->getModelMatrix();
     glm::vec3 corners[8] = {
@@ -47,17 +48,17 @@ AABB CreepEnemy::getWorldAABB() const
     return AABB(minPt, maxPt);
 }
 
-void CreepEnemy::update(float deltaTime)
+void ChargeEnemy::update(float deltaTime)
 {
     stateMachine.update(deltaTime);
 }
 
-void CreepEnemy::changeState(State<EnemyAbstract> *newState)
+void ChargeEnemy::changeState(State<EnemyAbstract> *newState)
 {
     stateMachine.changeState(newState);
 }
 
-void CreepEnemy::updateModelRotation(float deltaTime)
+void ChargeEnemy::updateModelRotation(float deltaTime)
 {
     glm::vec3 rotation = model->getRotation();
     if (glm::normalize(rotation) == direction)
@@ -78,7 +79,7 @@ void CreepEnemy::updateModelRotation(float deltaTime)
     model->setRotation(rotation);
 }
 
-void CreepEnemy::move(float deltaTime)
+void ChargeEnemy::move(float deltaTime)
 {
     stats.acceleration = direction * stats.accelerationRate;
     stats.velocity += stats.acceleration * deltaTime;
@@ -93,12 +94,12 @@ void CreepEnemy::move(float deltaTime)
     model->setPosition(newPos);
 }
 
-void CreepEnemy::draw()
+void ChargeEnemy::draw()
 {
     model->draw();
 }
 
-void CreepEnemy::drawText()
+void ChargeEnemy::drawText()
 {
     glm::vec3 pos = model->getPosition();
     glm::vec4 clipSpace = Global::getInstance().camera->getPerspectiveProjection(45.0f, (float)Global::getInstance().screenWidth / Global::getInstance().screenHeight, 0.1f, 100.0f) *
@@ -126,7 +127,8 @@ void CreepEnemy::drawText()
     for (size_t i = 0; i < word.size(); ++i)
     {
         char c = word[i];
-        if (!chars.count(c)) continue;
+        if (!chars.count(c))
+            continue;
 
         const Character &ch = chars.at(c);
 
@@ -139,4 +141,48 @@ void CreepEnemy::drawText()
 
         x += (ch.advance >> 6) * scale;
     }
+}
+
+void ChargeEnemy::uniqueTrigger(float deltaTime)
+{
+    if (ChargeEnemy::trigger(deltaTime))
+    {
+        ChargeEnemy::changeState(&EnemyChargeState::getInstance());
+    }
+}
+
+bool ChargeEnemy::trigger(float deltaTime)
+{
+    stats.triggerTime -= deltaTime;
+
+    if (stats.triggerTime > 0.0f)
+    {
+        return false;
+    }
+
+    stats.numberOfUnique--;
+
+    return true;
+}
+
+bool ChargeEnemy::uniqueMove(float deltaTime)
+{
+    return ChargeEnemy::charge(deltaTime);
+}
+
+bool ChargeEnemy::charge(float deltaTime)
+{
+    stats.chargeTime -= deltaTime;
+    stats.velocity = glm::vec3(0.0f);
+    stats.acceleration = glm::vec3(0.0f);
+
+    if (stats.chargeTime > 0.0f)
+    {
+        return false;
+    }
+
+    stats.accelerationRate = 5.0f;
+    stats.maxSpeed = 1.5f;
+
+    return true;
 }

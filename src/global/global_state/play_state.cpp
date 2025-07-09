@@ -18,7 +18,8 @@ void GlobalPlayState::update(Global *global, float deltaTime)
     if (elapsedTime >= 10.0f)
     {
         elapsedTime = 0.0f;
-        global->enemy.maxEnemyCount += 1;
+        // global->creepEnemyPool.maxEnemyCount += 1;
+        global->chargeEnemyPool.maxEnemyCount += 1;
     }
 
     glm::mat4 projection = global->camera->getPerspectiveProjection(45.0f, (float)global->screenWidth / global->screenHeight, 0.1f, 100.0f);
@@ -28,12 +29,20 @@ void GlobalPlayState::update(Global *global, float deltaTime)
     global->playerData.player->getModel()->getShader()->setMat4("mvp", glm::value_ptr(mvp));
     global->playerData.player->update(deltaTime);
 
-    global->enemy.updateCurrentEnemyCount();
-    while (global->enemy.currentEnemyCount < global->enemy.maxEnemyCount)
+    global->creepEnemyPool.updateCurrentEnemyCount();
+    while (global->creepEnemyPool.currentEnemyCount < global->creepEnemyPool.maxEnemyCount)
     {
-        if (global->enemy.spawn() != nullptr)
+        if (global->creepEnemyPool.spawn() != nullptr)
             break;
-        global->enemy.currentEnemyCount++;
+        global->creepEnemyPool.currentEnemyCount++;
+    }
+
+    global->chargeEnemyPool.updateCurrentEnemyCount();
+    while (global->chargeEnemyPool.currentEnemyCount < global->chargeEnemyPool.maxEnemyCount)
+    {
+        if (global->chargeEnemyPool.spawn() != nullptr)
+            break;
+        global->chargeEnemyPool.currentEnemyCount++;
     }
 
     for (auto &b : global->bulletPool.bullets)
@@ -53,7 +62,7 @@ void GlobalPlayState::update(Global *global, float deltaTime)
         b->update(deltaTime);
     }
 
-    for (auto &e : global->enemy.enemies)
+    for (auto &e : global->enemies)
     {
         if (e->getStateMachine().getCurrentState() == &EnemyDieState::getInstance())
         {
@@ -72,7 +81,7 @@ void GlobalPlayState::update(Global *global, float deltaTime)
 
     std::string typed = global->playerData.currentTypedWord;
     float scale = 1.0f, width = 0.0f;
-    const auto &chars = global->text->getCharacters();
+    const auto &chars = global->fontMap[FontSize::Normal]->getCharacters();
     for (char c : typed)
     {
         if (chars.count(c))
@@ -80,7 +89,7 @@ void GlobalPlayState::update(Global *global, float deltaTime)
     }
     float x = (global->screenWidth - width) / 2.0f;
     float y = 50.0f;
-    global->text->renderText(typed, x, y, scale, glm::vec3(0.2f, 0.2f, 0.2f));
+    global->fontMap[FontSize::Normal]->renderText(typed, x, y, scale, glm::vec3(0.2f, 0.2f, 0.2f));
 }
 void GlobalPlayState::exit(Global *global)
 {

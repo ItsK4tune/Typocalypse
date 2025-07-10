@@ -11,11 +11,10 @@ public:
     std::shared_ptr<Player> player;
     std::string currentTypedWord;
 
-    void init(const Shader &shader);
+    void init();
     void clear();
+
 private:
     std::shared_ptr<std::vector<Vertex>> playerVertices;
     std::shared_ptr<std::vector<GLuint>> playerIndices;
-
-    AABB initCircleMesh();
 };

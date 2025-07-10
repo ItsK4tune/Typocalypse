@@ -27,17 +27,9 @@ int main()
     ResourceManager::getInstance().loadFromFile("resource.rm");
     Global::getInstance().initText();
 
-    // enemy
-    std::vector<std::string> wordList = {"cat", "dog", "fish", "bird", "mouse", "elephant", "giraffe", "lion", "tiger", "bear",
-                                         "zebra", "monkey", "kangaroo", "panda", "rabbit", "fox", "wolf", "deer", "cow", "sheep"};
-
     // bullet
     Shader shader("basic.vert", "basic.frag");
-    Global::getInstance().playerData.init(shader);
     Global::getInstance().bulletPool.init(20, shader);
-    Global::getInstance().creepEnemyPool.init(100, shader, wordList);
-    Global::getInstance().chargeEnemyPool.init(100, shader, wordList);
-    Global::getInstance().createPool();
 
     float lastTime = glfwGetTime();
     float lastFrame = glfwGetTime();

@@ -10,6 +10,13 @@ GlobalPlayState &GlobalPlayState::getInstance()
 }
 void GlobalPlayState::enter(Global *global)
 {
+    std::vector<std::string> wordList = {"cat", "dog", "fish", "bird", "mouse", "elephant", "giraffe", "lion", "tiger", "bear",
+                                         "zebra", "monkey", "kangaroo", "panda", "rabbit", "fox", "wolf", "deer", "cow", "sheep"};
+
+    Global::getInstance().playerData.init();
+    Global::getInstance().creepEnemyPool.init(100, wordList);
+    Global::getInstance().chargeEnemyPool.init(100, wordList);
+    Global::getInstance().createPool();
 }
 void GlobalPlayState::update(Global *global, float deltaTime)
 {

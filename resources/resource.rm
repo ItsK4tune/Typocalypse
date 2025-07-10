@@ -1,12 +1,15 @@
-#model 1
-id enemy
-model "enemy.model"
+#model 3
+id 0
+model "creep_enemy.model"
+id 1
+model "charge_enemy.model"
+id 2
+model "player.model"
 
 #shader 2
-id default
+id 0
 vs "basic.vert"
 fs "basic.frag"
-
-id text
+id 1
 vs "text.vert"
 fs "text.frag"

@@ -58,45 +58,52 @@ void Model::loadModel(const std::string &filePath)
     }
 
     std::string line;
-    size_t vertexCount = 0;
-    size_t indexCount = 0;
-
     vertices = std::make_shared<std::vector<Vertex>>();
     indices = std::make_shared<std::vector<GLuint>>();
 
     while (std::getline(file, line))
     {
-        if (line.starts_with("#vertices"))
+        // Trim ký tự \r cuối dòng nếu có
+        if (!line.empty() && line.back() == '\r')
+            line.pop_back();
+
+        std::istringstream iss(line);
+        std::string tag;
+        iss >> tag;
+
+        if (tag == "#vertices")
         {
-            std::istringstream iss(line.substr(9));
+            size_t vertexCount;
             iss >> vertexCount;
 
             for (size_t i = 0; i < vertexCount; ++i)
             {
-                float px, py, pz;
-                float r, g, b;
-
                 std::getline(file, line);
+                if (!line.empty() && line.back() == '\r')
+                    line.pop_back();
+
+                float px, py, pz, r, g, b;
                 std::istringstream vss(line);
                 vss >> px >> py >> pz >> r >> g >> b;
 
                 Vertex v;
                 v.position = glm::vec3(px, py, pz);
                 v.color = glm::vec3(r, g, b);
-
                 vertices->push_back(v);
             }
         }
-        else if (line.starts_with("#indices"))
+        else if (tag == "#indices")
         {
-            std::istringstream iss(line.substr(8));
+            size_t indexCount;
             iss >> indexCount;
 
             for (size_t i = 0; i < indexCount; ++i)
             {
-                GLuint a, b, c;
-
                 std::getline(file, line);
+                if (!line.empty() && line.back() == '\r')
+                    line.pop_back();
+
+                GLuint a, b, c;
                 std::istringstream issTri(line);
                 issTri >> a >> b >> c;
 

@@ -2,13 +2,15 @@
 #include <iostream>
 #include <algorithm>
 
+#include "global/global.h"
+
 Menu::Menu() : stateMachine(this), textRenderer(nullptr) {}
 Menu::Menu(std::shared_ptr<TextRenderer> renderer) : stateMachine(this), textRenderer(renderer) {}
 
 void Menu::addTextItem(const std::string &text,
                        const glm::vec2 &pos,
                        float scale,
-                       const glm::vec3 &color)
+                       const glm::vec4 &color)
 {
     textItems.emplace_back(text, pos, scale, color);
 }
@@ -16,7 +18,7 @@ void Menu::addTextItem(const std::string &text,
 void Menu::setTextItem(size_t index,
                        const glm::vec2 &pos,
                        float scale,
-                       const glm::vec3 &color)
+                       const glm::vec4 &color)
 {
     if (index >= textItems.size())
     {
@@ -72,6 +74,17 @@ void Menu::render()
     for (auto &model : uiModels)
     {
         model->getShader()->use();
+
+        glm::mat4 projection = Global::getInstance().camera->getOrthoProjection(
+            0.0f,
+            static_cast<float>(Global::getInstance().screenWidth),
+            0.0f,
+            static_cast<float>(Global::getInstance().screenHeight),
+            -1.0f,
+            1.0f);
+
+        glm::mat4 mvp = projection * model->getModelMatrix();
+        model->getShader()->setMat4("mvp", glm::value_ptr(mvp));
         model->draw();
     }
 
@@ -79,7 +92,7 @@ void Menu::render()
     {
         const MenuItem &item = textItems[i];
         float scale = item.baseScale;
-        glm::vec3 color = item.baseColor;
+        glm::vec4 color = item.baseColor;
 
         if ((int)i == selectedIndex)
         {

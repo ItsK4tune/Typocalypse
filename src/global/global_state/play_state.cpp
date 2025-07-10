@@ -16,6 +16,7 @@ void GlobalPlayState::enter(Global *global)
     Global::getInstance().playerData.init();
     Global::getInstance().creepEnemyPool.init(100, wordList);
     Global::getInstance().chargeEnemyPool.init(100, wordList);
+    Global::getInstance().bulletPool.init(20);
     Global::getInstance().createPool();
 }
 void GlobalPlayState::update(Global *global, float deltaTime)

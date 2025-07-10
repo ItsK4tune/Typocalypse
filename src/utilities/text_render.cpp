@@ -1,23 +1,23 @@
 #include "utilities/text_renderer.h"
 #include <glad/glad.h>
 #include <iostream>
+#include "resource_manager/resource_manager.h"
+#include "utilities/resource_enum.h"
 
 TextRenderer::TextRenderer(int w, int h)
-    : screenWidth(w), screenHeight(h), textShader("text.vert", "text.frag")
+    : screenWidth(w), screenHeight(h), textShader(ResourceManager::getInstance().getShader(std::to_string(static_cast<int>(ShaderType::Text))))
 {
-    textShader.use();
+    textShader->use();
     glm::mat4 projection = glm::ortho(0.0f, (float)w, 0.0f, (float)h);
-    textShader.setMat4("projection", &projection[0][0]);
+    textShader->setMat4("projection", &projection[0][0]);
 
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 5, nullptr, GL_DYNAMIC_DRAW);
-    // Attribute 0: position (vec3)
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)0);
-    // Attribute 1: texCoord (vec2)
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)(3 * sizeof(float)));
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -78,13 +78,14 @@ void TextRenderer::load(const std::string &fontPath, unsigned int fontSize)
     FT_Done_FreeType(ft);
 }
 
-void TextRenderer::renderText(const std::string &text, float x, float y, float scale, const glm::vec3 &color)
+void TextRenderer::renderText(const std::string &text, float x, float y, float scale, const glm::vec4 &color)
 {
-    textShader.use();
+    textShader->use();
     float red = color.x;
     float green = color.y;
     float blue = color.z;
-    textShader.setVec3("textColor", red, green, blue);
+    float alpha = color.a;
+    textShader->setVec4("textColor", red, green, blue, alpha);
     glActiveTexture(GL_TEXTURE0);
     glBindVertexArray(VAO);
 

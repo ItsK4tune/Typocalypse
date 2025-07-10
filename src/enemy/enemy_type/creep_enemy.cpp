@@ -133,7 +133,7 @@ void CreepEnemy::drawText()
         float xpos = x;
         float ypos = y;
 
-        glm::vec3 color = matchMask[i] ? glm::vec3(0.9f, 0.1f, 0.1f) : glm::vec3(0.1f, 0.1f, 0.1f);
+        glm::vec4 color = matchMask[i] ? glm::vec4(0.9f, 0.1f, 0.1f, 1.0f) : glm::vec4(0.1f, 0.1f, 0.1f, 1.0f);
 
         Global::getInstance().fontMap[FontSize::Normal]->renderText(std::string(1, c), xpos, ypos, scale, color);
 

@@ -5,8 +5,8 @@
 #include <random>
 
 #include "enemy/enemy_state.h"
-#include "utilities/shader_type.h"
 #include "resource_manager/resource_manager.h"
+#include "utilities/resource_enum.h"
 
 void ChargeEnemyPool::init(size_t count, const std::vector<std::string> &wordList)
 {
@@ -33,7 +33,7 @@ void ChargeEnemyPool::init(size_t count, const std::vector<std::string> &wordLis
 
     for (size_t i = 0; i < count; ++i)
     {
-        auto enemyModel = std::make_shared<Model>(*ResourceManager::getInstance().getModel(std::to_string(static_cast<int>(EnemyType::ChargeEnemy))));
+        auto enemyModel = std::make_shared<Model>(*ResourceManager::getInstance().getModel(std::to_string(static_cast<int>(ResourceType::ChargeEnemy))));
         enemyModel->setShader(ResourceManager::getInstance().getShader(std::to_string(static_cast<int>(ShaderType::Default))));
         auto e = std::make_shared<ChargeEnemy>(enemyModel);
         e->setLocalAABB(enemyModel->getAABB());

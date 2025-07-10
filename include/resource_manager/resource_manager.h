@@ -6,6 +6,7 @@
 
 #include "shader.h"
 #include "model.h"
+#include "texture.h"
 
 class ResourceManager {
 public:
@@ -15,6 +16,7 @@ public:
 
     std::shared_ptr<Shader> getShader(const std::string& id) const;
     std::shared_ptr<Model> getModel(const std::string& id) const;
+    std::shared_ptr<Texture> getTexture(const std::string& id) const;
 
     void clear();
 
@@ -25,7 +27,9 @@ private:
 
     std::unordered_map<std::string, std::shared_ptr<Shader>> shaders;
     std::unordered_map<std::string, std::shared_ptr<Model>> models;
+    std::unordered_map<std::string, std::shared_ptr<Texture>> textures;
 
     std::shared_ptr<Shader> loadShader(const std::string& vsPath, const std::string& fsPath, const std::string& gsPath = "");
-    std::shared_ptr<Model> loadModelFromPath(const std::string& path);
+    std::shared_ptr<Model> loadModel(const std::string& path);
+    std::shared_ptr<Texture> loadTexture(const std::string& path);
 };

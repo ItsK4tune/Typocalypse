@@ -44,7 +44,7 @@ void ResourceManager::loadFromFile(const std::string &filePath)
                 std::string modelTag, path;
                 modelStream >> modelTag >> std::quoted(path);
 
-                models[id] = loadModelFromPath(path);
+                models[id] = loadModel(path);
             }
         }
         else if (line.starts_with("#shader"))
@@ -87,7 +87,36 @@ void ResourceManager::loadFromFile(const std::string &filePath)
                     ss >> ignore >> std::quoted(gsPath);
                 }
 
-                shaders[id] = loadShader(vsPath, fsPath, gsPath);
+                shaders[id] = !gsPath.empty() ? loadShader(vsPath, fsPath, gsPath) : loadShader(vsPath, fsPath);
+            }
+        }
+        else if (line.starts_with("#texture"))
+        {
+            int textureCount;
+            std::istringstream(line.substr(8)) >> textureCount;
+
+            for (int i = 0; i < textureCount; ++i)
+            {
+                std::string idLine, texLine;
+
+                std::getline(file, idLine);
+                std::getline(file, texLine);
+
+                std::string id;
+                {
+                    std::istringstream ss(idLine);
+                    std::string ignore;
+                    ss >> ignore >> id;
+                }
+
+                std::string texPath;
+                {
+                    std::istringstream ss(texPath);
+                    std::string ignore;
+                    ss >> ignore >> std::quoted(texPath);
+                }
+
+                textures[id] = loadTexture(texPath);
             }
         }
     }
@@ -101,9 +130,13 @@ std::shared_ptr<Shader> ResourceManager::loadShader(const std::string &vsPath, c
         return std::make_shared<Shader>(vsPath, fsPath, gsPath);
 }
 
-std::shared_ptr<Model> ResourceManager::loadModelFromPath(const std::string &path)
+std::shared_ptr<Model> ResourceManager::loadModel(const std::string &path)
 {
     return std::make_shared<Model>(path);
+}
+
+std::shared_ptr<Texture> ResourceManager::loadTexture(const std::string &path){
+    return std::make_shared<Texture>(path);
 }
 
 std::shared_ptr<Shader> ResourceManager::getShader(const std::string &id) const
@@ -116,6 +149,12 @@ std::shared_ptr<Model> ResourceManager::getModel(const std::string &id) const
 {
     auto it = models.find(id);
     return (it != models.end()) ? it->second : nullptr;
+}
+
+std::shared_ptr<Texture> ResourceManager::getTexture(const std::string &id) const
+{
+    auto it = textures.find(id);
+    return (it != textures.end()) ? it->second : nullptr;
 }
 
 void ResourceManager::clear()

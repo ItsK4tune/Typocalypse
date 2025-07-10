@@ -15,7 +15,6 @@
 #include "resource_manager/resource_manager.h"
 
 #include "utilities/init.h"
-#include "utilities/genMesh.h"
 #include "utilities/text_renderer.h"
 #include "utilities/AABB.h"
 
@@ -26,10 +25,6 @@ int main()
     Global::getInstance().window = createWindow(Global::getInstance().screenWidth, Global::getInstance().screenHeight, "Typocalypse");
     ResourceManager::getInstance().loadFromFile("resource.rm");
     Global::getInstance().initText();
-
-    // bullet
-    Shader shader("basic.vert", "basic.frag");
-    Global::getInstance().bulletPool.init(20, shader);
 
     float lastTime = glfwGetTime();
     float lastFrame = glfwGetTime();

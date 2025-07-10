@@ -1,6 +1,7 @@
 #pragma once
 
 #include <map>
+#include <memory>
 #include <string>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -24,11 +25,11 @@ public:
     const std::map<char, Character>& getCharacters() const { return characters; }
 
     void load(const std::string& fontPath, unsigned int fontSize);
-    void renderText(const std::string& text, float x, float y, float scale, const glm::vec3& color);
+    void renderText(const std::string& text, float x, float y, float scale, const glm::vec4& color);
 
 private:
     std::map<char, Character> characters;
     unsigned int VAO, VBO;
-    Shader textShader;
+    std::shared_ptr<Shader> textShader;
     int screenWidth, screenHeight;
 };

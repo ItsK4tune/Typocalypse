@@ -16,6 +16,15 @@ Model::Model(std::shared_ptr<std::vector<Vertex>> vertices, std::shared_ptr<std:
     initialize();
 }
 
+Model::Model(std::shared_ptr<std::vector<Vertex>> vertices,
+             std::shared_ptr<std::vector<GLuint>> indices,
+             std::shared_ptr<Texture> texture)
+    : vertices(vertices), indices(indices), texture(texture), shader(nullptr),
+      VAO(0), VBO(0), EBO(0)
+{
+    initialize();
+}
+
 Model::Model(const std::string &filePath)
     : vertices(nullptr), indices(nullptr), shader(nullptr),
       VAO(0), VBO(0), EBO(0)
@@ -63,7 +72,6 @@ void Model::loadModel(const std::string &filePath)
 
     while (std::getline(file, line))
     {
-        // Trim ký tự \r cuối dòng nếu có
         if (!line.empty() && line.back() == '\r')
             line.pop_back();
 
@@ -82,13 +90,15 @@ void Model::loadModel(const std::string &filePath)
                 if (!line.empty() && line.back() == '\r')
                     line.pop_back();
 
-                float px, py, pz, r, g, b;
+                float px, py, pz, r, g, b, a = 1.0f;
                 std::istringstream vss(line);
                 vss >> px >> py >> pz >> r >> g >> b;
+                if (!(vss >> a))
+                    a = 1.0f;
 
                 Vertex v;
                 v.position = glm::vec3(px, py, pz);
-                v.color = glm::vec3(r, g, b);
+                v.color = glm::vec4(r, g, b, a);
                 vertices->push_back(v);
             }
         }
@@ -152,7 +162,7 @@ void Model::initialize()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)0);
 
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)(offsetof(Vertex, color)));
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)(offsetof(Vertex, color)));
 
     glEnableVertexAttribArray(2);
     glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)(offsetof(Vertex, normal)));
@@ -183,19 +193,29 @@ void Model::draw()
         return;
     }
 
+    shader->use();
+
+    if (texture)
+    {
+        texture->BindToUnit(0);
+        shader->setInt("uTexture", 0);
+    }
+
     GLuint indexCount = static_cast<unsigned int>(indices->size());
 
-    shader->use();
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
+
+    if (texture)
+        texture->Unbind();
 }
 
-void Model::setShader(std::shared_ptr<Shader> shader)
-{
-    this->shader = shader;
-}
-
+std::shared_ptr<Shader> Model::getShader() const { return shader; }
+std::shared_ptr<Texture> Model::getTexture() const { return texture; }
+glm::vec3 Model::getPosition() const { return position; }
+glm::vec3 Model::getRotation() const { return rotation; }
+glm::vec3 Model::getScale() const { return scale; }
 glm::mat4 Model::getModelMatrix() const
 {
     glm::mat4 model = glm::mat4(1.0f);
@@ -229,3 +249,9 @@ AABB Model::getAABB() const
 
     return AABB(minPoint, maxPoint);
 }
+
+void Model::setShader(std::shared_ptr<Shader> shader) { this->shader = shader; };
+void Model::setTexture(std::shared_ptr<Texture> tex) { texture = tex; };
+void Model::setPosition(const glm::vec3 &pos) { position = pos; }
+void Model::setRotation(const glm::vec3 &rot) { rotation = rot; }
+void Model::setScale(const glm::vec3 &scl) { scale = scl; }

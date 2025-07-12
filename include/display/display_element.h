@@ -1,8 +1,9 @@
 #pragma once
 
-class IMenuElement {
+class IDisplayElement
+{
 public:
-    virtual ~IMenuElement() = default;
+    virtual ~IDisplayElement() = default;
 
     virtual void update(float dt) = 0;
     virtual void render() = 0;

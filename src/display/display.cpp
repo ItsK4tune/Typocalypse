@@ -1,28 +1,28 @@
-#include "menu/menu.h"
+#include "display/display.h"
 #include <iostream>
 #include <algorithm>
 
 #include "global/global.h"
 
-Menu::Menu() : stateMachine(this), textRenderer(nullptr) {}
-Menu::Menu(std::shared_ptr<TextRenderer> renderer) : stateMachine(this), textRenderer(renderer) {}
+Display::Display() : stateMachine(this), textRenderer(nullptr) {}
+Display::Display(std::shared_ptr<TextRenderer> renderer) : stateMachine(this), textRenderer(renderer) {}
 
-void Menu::addTextItem(const std::string &text,
-                       const glm::vec2 &pos,
-                       float scale,
-                       const glm::vec4 &color)
+void Display::addTextItem(const std::string &text,
+                          const glm::vec2 &pos,
+                          float scale,
+                          const glm::vec4 &color)
 {
     textItems.emplace_back(text, pos, scale, color);
 }
 
-void Menu::setTextItem(size_t index,
-                       const glm::vec2 &pos,
-                       float scale,
-                       const glm::vec4 &color)
+void Display::setTextItem(size_t index,
+                          const glm::vec2 &pos,
+                          float scale,
+                          const glm::vec4 &color)
 {
     if (index >= textItems.size())
     {
-        std::cerr << "[Menu] Invalid item index: " << index << "\n";
+        std::cerr << "[Display] Invalid item index: " << index << "\n";
         return;
     }
 
@@ -31,45 +31,45 @@ void Menu::setTextItem(size_t index,
     textItems[index].baseColor = color;
 }
 
-void Menu::clearTexts()
+void Display::clearTexts()
 {
     textItems.clear();
     selectedIndex = 0;
 }
 
-void Menu::addModel(std::shared_ptr<Model> model)
+void Display::addModel(std::shared_ptr<Model> model)
 {
     uiModels.push_back(model);
 }
 
-void Menu::clearModels()
+void Display::clearModels()
 {
     uiModels.clear();
 }
 
-void Menu::setTextRenderer(std::shared_ptr<TextRenderer> text)
+void Display::setTextRenderer(std::shared_ptr<TextRenderer> text)
 {
     textRenderer = text;
 }
 
-void Menu::moveUp()
+void Display::moveUp()
 {
     if (!textItems.empty())
         selectedIndex = (selectedIndex - 1 + textItems.size()) % textItems.size();
 }
 
-void Menu::moveDown()
+void Display::moveDown()
 {
     if (!textItems.empty())
         selectedIndex = (selectedIndex + 1) % textItems.size();
 }
 
-int Menu::getSelectedIndex() const
+int Display::getSelectedIndex() const
 {
     return selectedIndex;
 }
 
-void Menu::render()
+void Display::render()
 {
     for (auto &model : uiModels)
     {
@@ -90,7 +90,7 @@ void Menu::render()
 
     for (size_t i = 0; i < textItems.size(); ++i)
     {
-        const MenuItem &item = textItems[i];
+        const DisplayItem &item = textItems[i];
         float scale = item.baseScale;
         glm::vec4 color = item.baseColor;
 
@@ -104,17 +104,17 @@ void Menu::render()
     }
 }
 
-void Menu::update(float deltaTime)
+void Display::update(float deltaTime)
 {
     stateMachine.update(deltaTime);
 }
 
-void Menu::changeState(State<Menu> *newState)
+void Display::changeState(State<Display> *newState)
 {
     stateMachine.changeState(newState);
 }
 
-MenuStateMachine &Menu::getStateMachine()
+DisplayStateMachine &Display::getStateMachine()
 {
     return stateMachine;
 }

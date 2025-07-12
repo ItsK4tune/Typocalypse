@@ -12,7 +12,7 @@ void GlobalMenuState::enter(Global *global)
 }
 void GlobalMenuState::update(Global *global, float deltaTime)
 {
-    global->menu->update(deltaTime);
+    global->display->update(deltaTime);
     // global->drawText();
 
     if (global->game.isMousePressed &&

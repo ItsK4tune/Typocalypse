@@ -28,7 +28,7 @@ void Global::initText()
     fontMap[FontSize::Normal] = std::make_shared<TextRenderer>(screenWidth, screenHeight);
     fontMap[FontSize::Normal]->load("TimesRegular.ttf", toInt(FontSize::Normal));
 
-    menu = std::make_shared<Menu>(fontMap[FontSize::Menu]);
+    display = std::make_shared<Display>(fontMap[FontSize::Menu]);
 }
 void Global::createPool()
 {

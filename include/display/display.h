@@ -6,28 +6,28 @@
 #include <glm/glm.hpp>
 
 #include "utilities/text_renderer.h"
-#include "menu/menu_state_machine.h"
+#include "display/display_state_machine.h"
 #include "model.h"
 
-struct MenuItem
+struct DisplayItem
 {
     std::string text;
     glm::vec2 position;
     float baseScale;
     glm::vec4 baseColor;
 
-    MenuItem(const std::string &t,
-             const glm::vec2 &pos,
-             float s = 1.0f,
-             const glm::vec4 &c = glm::vec4(1.0f))
+    DisplayItem(const std::string &t,
+                const glm::vec2 &pos,
+                float s = 1.0f,
+                const glm::vec4 &c = glm::vec4(1.0f))
         : text(t), position(pos), baseScale(s), baseColor(c) {}
 };
 
-class Menu
+class Display
 {
 public:
-    Menu();
-    Menu(std::shared_ptr<TextRenderer> renderer);
+    Display();
+    Display(std::shared_ptr<TextRenderer> renderer);
 
     void addTextItem(const std::string &text,
                      const glm::vec2 &pos,
@@ -50,15 +50,15 @@ public:
 
     void render();
     void update(float dt);
-    void changeState(State<Menu> *newState);
-    MenuStateMachine &getStateMachine();
+    void changeState(State<Display> *newState);
+    DisplayStateMachine &getStateMachine();
 
 private:
-    std::vector<MenuItem> textItems;
+    std::vector<DisplayItem> textItems;
     std::vector<std::shared_ptr<Model>> uiModels;
 
     std::shared_ptr<TextRenderer> textRenderer;
-    MenuStateMachine stateMachine;
+    DisplayStateMachine stateMachine;
 
     int selectedIndex = 0;
     const float hoverScaleBoost = 0.2f;

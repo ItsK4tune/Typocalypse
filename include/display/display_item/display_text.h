@@ -5,15 +5,16 @@
 #include <memory>
 
 #include "utilities/text_renderer.h"
-#include "menu/menu_element.h"
+#include "display/display_element.h"
 
-class MenuTextItem : public IMenuElement {
+class DisplayTextItem : public IDisplayElement
+{
 public:
-    MenuTextItem(const std::string &text,
-                 const glm::vec2 &pos,
-                 float scale,
-                 const glm::vec4 &color,
-                 std::shared_ptr<TextRenderer> renderer);
+    DisplayTextItem(const std::string &text,
+                    const glm::vec2 &pos,
+                    float scale,
+                    const glm::vec4 &color,
+                    std::shared_ptr<TextRenderer> renderer);
 
     void update(float dt) override;
     void render() override;

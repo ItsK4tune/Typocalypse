@@ -1,4 +1,4 @@
-#include "menu/menu_state.h"
+#include "display/display_state.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -7,44 +7,44 @@
 #include "resource_manager/resource_manager.h"
 #include "utilities/resource_enum.h"
 
-MenuMainState::MenuMainState() {}
+DisplayMainState::DisplayMainState() {}
 
-MenuMainState &MenuMainState::getInstance()
+DisplayMainState &DisplayMainState::getInstance()
 {
-    static MenuMainState instance;
+    static DisplayMainState instance;
     return instance;
 }
 
-void MenuMainState::enter(Menu *menu)
+void DisplayMainState::enter(Display *display)
 {
-    menu->clearTexts();
-    menu->clearModels();
+    display->clearTexts();
+    display->clearModels();
 
     float xStart = Global::getInstance().screenHeight * 0.2;
     float yStart = Global::getInstance().screenHeight * 0.1;
     float gap = 80.0f;
 
-    menu->addTextItem("Play", glm::vec2(xStart, yStart + 0 * gap));
-    menu->addTextItem("Settings", glm::vec2(xStart, yStart + 1 * gap));
-    menu->addTextItem("Exit", glm::vec2(xStart, yStart + 2 * gap));
+    display->addTextItem("Play", glm::vec2(xStart, yStart + 0 * gap));
+    display->addTextItem("Settings", glm::vec2(xStart, yStart + 1 * gap));
+    display->addTextItem("Exit", glm::vec2(xStart, yStart + 2 * gap));
 
     auto logoModel = std::make_shared<Model>(*ResourceManager::getInstance().getModel(std::to_string(static_cast<int>(ResourceType::Logo))));
     logoModel->setShader(ResourceManager::getInstance().getShader(std::to_string(static_cast<int>(ShaderType::UI))));
-    menu->addModel(logoModel);
+    display->addModel(logoModel);
 }
 
-void MenuMainState::update(Menu *menu, float deltaTime)
+void DisplayMainState::update(Display *display, float deltaTime)
 {
     if (glfwGetKey(Global::getInstance().window, GLFW_KEY_UP) == GLFW_PRESS)
-        menu->moveUp();
+        display->moveUp();
 
     if (glfwGetKey(Global::getInstance().window, GLFW_KEY_DOWN) == GLFW_PRESS)
-        menu->moveDown();
+        display->moveDown();
 
-    menu->render();
+    display->render();
 }
 
-void MenuMainState::exit(Menu *menu)
+void DisplayMainState::exit(Display *display)
 {
     // Có thể fade out hoặc cleanup nếu muốn
 }

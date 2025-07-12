@@ -5,7 +5,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "menu/menu.h"
+#include "display/display.h"
 #include "camera.h"
 #include "global/global_state_machine.h"
 #include "pool/creep_enemy_pool.h"
@@ -44,7 +44,7 @@ public:
     Global &operator=(const Global &) = delete;
 
     GLFWwindow *window;
-    std::shared_ptr<Menu> menu;
+    std::shared_ptr<Display> display;
 
     GameAttribute attribute;
     PlayerData playerData;
